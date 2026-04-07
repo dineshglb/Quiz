@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Murli Drag Quiz</title>
+
+<script src="https://cdn.jsdelivr.net/npm/mobile-drag-drop@2.3.0-beta.2/index.min.js"></script>
+<script>
+  // Initialize the touch polyfill
+  MobileDragDrop.polyfill({
+      holdToDrag: 0 // Drag starts instantly upon touch
+  });
+  // Prevent screen from scrolling while dragging an item
+  window.addEventListener('touchmove', function() {}, {passive: false});
+</script>
+
+<style>
+:root {
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --color-background-primary: #ffffff;
+  --color-background-secondary: #f7f7f7;
+  --color-border-secondary: #e5e5e5;
+  --color-border-tertiary: #f0f0f0;
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #666666;
+  --color-text-tertiary: #999999;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+body { background: #fafafa; -webkit-tap-highlight-color: transparent; }
+
+/* Added side padding for mobile screens */
+.wrap{padding:1.5rem 1rem;max-width:640px;margin:auto;font-family:var(--font-sans);background:#fff;min-height: 100vh;}
+
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;}
+.lbl{font-size:14px;color:var(--color-text-secondary);}
+.scr{font-size:16px;font-weight:600;color:var(--color-text-primary);}
+.prog-bg{height:6px;background:var(--color-border-tertiary);border-radius:3px;margin-bottom:1.5rem;}
+.prog-fill{height:6px;background:#D85A30;border-radius:3px;transition:width 0.4s;}
+.round-lbl{font-size:13px;color:var(--color-text-secondary);margin-bottom:1rem;text-align:center;font-weight:500;}
+
+/* Changed from two big columns to row-by-row grid to prevent misalignment on mobile */
+.col-head-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px;}
+.col-head{font-size:12px;font-weight:600;color:var(--color-text-secondary);text-align:center;text-transform:uppercase;letter-spacing:0.5px;}
+
+.match-list{display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem;}
+.match-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+.q-card{background:var(--color-background-primary);border:1px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:10px 12px;font-size:13px;color:var(--color-text-primary);line-height:1.4;display:flex;align-items:center;box-shadow: 0 1px 2px rgba(0,0,0,0.02);}
+.drop-zone{background:var(--color-background-secondary);border:1px dashed #cccccc;border-radius:var(--border-radius-md);padding:10px 12px;font-size:13px;color:var(--color-text-tertiary);display:flex;align-items:center;justify-content:center;transition:all 0.2s;min-height: 52px;}
+
+.drop-zone.over{background:#FAECE7;border-color:#D85A30;}
+.drop-zone.filled{background:var(--color-background-primary);border:1px solid #D85A30;color:var(--color-text-primary);justify-content:space-between;cursor:pointer;}
+.drop-zone.correct{background:#E1F5EE;border-color:#1D9E75;color:#085041;}
+.drop-zone.wrong{background:#FCEBEB;border-color:#E24B4A;color:#501313;}
+
+.drag-pool{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1.5rem;justify-content: center;}
+.drag-chip{background:var(--color-background-primary);border:1px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:10px 14px;font-size:14px;color:var(--color-text-primary);cursor:grab;user-select:none;transition:background 0.15s;box-shadow: 0 1px 3px rgba(0,0,0,0.05);touch-action: none;} /* touch-action none prevents scrolling when grabbing */
+.drag-chip:hover, .drag-chip:active{background:var(--color-background-secondary);}
+.drag-chip.dragging{opacity:0.4; transform: scale(1.05);}
+.drag-chip.used{display:none;}
+
+.btn-row{display:flex;gap:12px;justify-content:center;margin-top:1rem;}
+.btn{padding:12px 24px;font-size:15px;font-weight:500;border-radius:var(--border-radius-md);cursor:pointer;border:1px solid var(--color-border-secondary);background:transparent;color:var(--color-text-primary);flex:1;max-width: 160px;}
+.btn-primary{background:#D85A30;color:#fff;border-color:#D85A30;border:none;box-shadow: 0 2px 4px rgba(216,90,48,0.3);}
+.btn-primary:hover, .btn-primary:active{background:#b84924;}
+
+.remove-btn{font-size:12px;color:var(--color-text-secondary);cursor:pointer;padding:4px 8px;background: var(--color-background-secondary);border-radius:4px;}
+
+.final-card{background:var(--color-background-primary);border:1px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:2.5rem 1rem;text-align:center;box-shadow: 0 4px 12px rgba(0,0,0,0.05);}
+.final-score{font-size:48px;font-weight:600;color:#D85A30;margin:1rem 0;}
+.final-msg{font-size:16px;color:var(--color-text-secondary);margin-bottom:2rem;}
+.badge{display:inline-block;padding:6px 14px;border-radius:var(--border-radius-md);font-size:13px;font-weight:500;margin-bottom:1rem;background:#FAECE7;color:#4A1B0C;}
+
+/* Small tweak for very small phones */
+@media (max-width: 360px) {
+  .col-head-row { display: none; } /* Hide headers on tiny screens to save space */
+  .match-row { display: flex; flex-direction: column; gap: 4px; padding-bottom: 12px; border-bottom: 1px solid var(--color-border-tertiary); }
+  .q-card { border: none; padding: 4px 0; font-weight: 500; min-height: auto;}
+  .drop-zone { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="topbar">
+    <span class="lbl" id="rlbl">Round 1 / 2</span>
+    <span class="scr" id="scr">Score: 0</span>
+  </div>
+  <div class="prog-bg"><div class="prog-fill" id="prog" style="width:50%"></div></div>
+  <div id="game-area"></div>
+</div>
+
+<script>
+const rounds = [
+  {
+    pairs:[
+      {q:"कलकत्ता की सबसे बड़ी नदी?", a:"ब्रह्मपुत्रा"},
+      {q:"ब्रह्मा का असली नाम?", a:"लखीराज"},
+      {q:"विष्णु को कितनी भुजाएँ?", a:"चार"},
+      {q:"मृत्युलोक कितने वर्ष चलता है?", a:"2500"},
+      {q:"रावण के आने पर कौन सी दशा?", a:"राहू"},
+    ]
+  },
+  {
+    pairs:[
+      {q:"सूर्यवंशियों पर किसकी दशा?", a:"ब्रहस्पति"},
+      {q:"चन्द्रवंशियों पर किसकी दशा?", a:"चक्र"},
+      {q:"काम-चिता से उतरकर किस चिता पर?", a:"ज्ञान"},
+      {q:"सरस्वती किसकी एडाप्टेड बच्ची?", a:"ब्रह्मा"},
+      {q:"शिवबाबा किस रथ में आए?", a:"ब्रह्मा"},
+    ]
+  }
+];
+
+let round=0, score=0, zoneData={}, dragId=null, checked=false;
+
+function shuffle(arr){return [...arr].sort(()=>Math.random()-0.5);}
+
+function render(){
+  const area=document.getElementById('game-area');
+  if(round>=rounds.length){
+    area.innerHTML=`<div class="final-card">
+      <div class="badge">Murli Drag Quiz</div>
+      <div class="final-score">${score} / ${rounds.reduce((s,r)=>s+r.pairs.length,0)}</div>
+      <div class="final-msg">${score>=8?'Wow! Excellent!':score>=5?'Good effort! Keep practicing.':'Try again!'}</div>
+      <button class="btn btn-primary" onclick="restart()">Play Again</button>
+    </div>`;
+    return;
+  }
+  checked=false;
+  zoneData={};
+  const r=rounds[round];
+  const answers=shuffle(r.pairs.map(p=>p.a));
+  document.getElementById('rlbl').textContent=`Round ${round+1} / ${rounds.length}`;
+  document.getElementById('prog').style.width=((round+1)/rounds.length*100)+'%';
+
+  let rowsHTML='';
+  r.pairs.forEach((p,i)=>{
+    rowsHTML+=`
+    <div class="match-row">
+      <div class="q-card">${p.q}</div>
+      <div class="drop-zone" id="zone-${i}" data-idx="${i}" 
+        ondragover="ev(event)" ondragleave="el(event)" ondrop="drop(event,${i})">
+        <span style="color:var(--color-text-tertiary);font-size:12px;">Drop here</span>
+      </div>
+    </div>`;
+  });
+
+  let chipsHTML='';
+  answers.forEach((a,i)=>{
+    chipsHTML+=`<div class="drag-chip" id="chip-${i}" draggable="true"
+      ondragstart="ds(event,'${a}','chip-${i}')"
+      ondragend="de(event)">${a}</div>`;
+  });
+
+  area.innerHTML=`
+    <div class="round-lbl">Drag the correct answer and drop it next to the question. To drag the answer, long press the answer and move it to next to the respective question.</div>
+    <div class="col-head-row">
+      <div class="col-head">Question</div>
+      <div class="col-head">Answer</div>
+    </div>
+    <div class="match-list">${rowsHTML}</div>
+    <div class="col-head" style="margin-bottom:12px;">Choose Answer</div>
+    <div class="drag-pool">${chipsHTML}</div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="checkAnswers()">Check</button>
+      <button class="btn" onclick="resetRound()">Reset</button>
+    </div>
+  `;
+}
+
+function ds(e,val,chipId){dragId={val,chipId};e.target.classList.add('dragging');}
+function de(e){e.target.classList.remove('dragging');}
+function ev(e){e.preventDefault();e.currentTarget.classList.add('over');}
+function el(e){e.currentTarget.classList.remove('over');}
+
+function drop(e,idx){
+  e.preventDefault();
+  e.currentTarget.classList.remove('over');
+  if(!dragId||checked)return;
+  const prev=zoneData[idx];
+  if(prev){
+    const oldChip=document.getElementById(prev.chipId);
+    if(oldChip)oldChip.classList.remove('used');
+  }
+  zoneData[idx]=dragId;
+  const chip=document.getElementById(dragId.chipId);
+  if(chip)chip.classList.add('used');
+  const zone=document.getElementById('zone-'+idx);
+  zone.className='drop-zone filled';
+  zone.innerHTML=`<span>${dragId.val}</span><span class="remove-btn" onclick="removeFromZone(${idx})">✕</span>`;
+  dragId=null;
+}
+
+function removeFromZone(idx){
+  if(checked)return;
+  const d=zoneData[idx];
+  if(!d)return;
+  const chip=document.getElementById(d.chipId);
+  if(chip)chip.classList.remove('used');
+  delete zoneData[idx];
+  const zone=document.getElementById('zone-'+idx);
+  zone.className='drop-zone';
+  zone.innerHTML=`<span style="color:var(--color-text-tertiary);font-size:12px;">Drop here</span>`;
+}
+
+function checkAnswers(){
+  if(checked)return;
+  checked=true;
+  const r=rounds[round];
+  let gained=0;
+  r.pairs.forEach((p,i)=>{
+    const zone=document.getElementById('zone-'+i);
+    const placed=zoneData[i];
+    if(placed && placed.val===p.a){
+      zone.className='drop-zone correct';
+      zone.innerHTML=`<span>${placed.val}</span><span style="font-size:14px;">✓</span>`;
+      gained++;
+    } else {
+      zone.className='drop-zone wrong';
+      const shown=placed?placed.val:'—';
+      zone.innerHTML=`<span style="text-decoration:line-through">${shown}</span><span style="font-size:12px;margin-left:6px;">→ ${p.a}</span>`;
+    }
+  });
+  score+=gained;
+  document.getElementById('scr').textContent=`Score: ${score}`;
+  const btnRow=document.querySelector('.btn-row');
+  btnRow.innerHTML=`<button class="btn btn-primary" onclick="nextRound()">${round<rounds.length-1?'Next Round →':'View Results'}</button>`;
+}
+
+function nextRound(){round++;render();}
+function resetRound(){zoneData={};render();}
+function restart(){round=0;score=0;render();}
+
+render();
+</script>
+</body>
+</html>
