@@ -238,7 +238,7 @@ function render(){
       // Fetch Top Leaderboard (You can update "desc" to "asc" if you want to sort by something else later)
       db.collection("leaderboard")
         .orderBy("score", "desc").orderBy("durationSeconds", "asc")
-        .limit(5)
+        .limit(20)
         .get()
         .then((snapshot) => {
           let boardHTML = `<div class="lb-container">`;
