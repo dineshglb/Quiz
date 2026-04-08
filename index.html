@@ -9,11 +9,16 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/mobile-drag-drop@2.3.0-beta.2/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mobile-drag-drop@2.3.0-beta.2/scroll-behaviour.min.js"></script>
 <script>
-  // Initialize touch polyfill
-  MobileDragDrop.polyfill({ holdToDrag: 0 });
-  // Prevent screen scrolling while dragging
-  window.addEventListener('touchmove', function() {}, {passive: false});
+  // 2. Initialize touch polyfill with Auto-Scroll turned on
+  MobileDragDrop.polyfill({ 
+      holdToDrag: 0,
+      dragImageTranslateOverride: MobileDragDrop.scrollBehaviourDragImageTranslateOverride
+  });
+  
+  // 3. Prevent 'pull-to-refresh' on mobile but allow normal scrolling
+  window.addEventListener('touchmove', function(e) {}, {passive: false});
 </script>
 
 <style>
