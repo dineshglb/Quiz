@@ -215,6 +215,8 @@ function render(){
 
   if(round>=rounds.length){
     // CALCULATE TIME TAKEN
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); 
     const endTime = Date.now();
     const durationMs = endTime - startTime;
     const totalSeconds = Math.floor(durationMs / 1000);
@@ -236,7 +238,7 @@ function render(){
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     }).then(() => {
       // Fetch Top Leaderboard (You can update "desc" to "asc" if you want to sort by something else later)
-      db.collection("leaderboard")
+      db.collection("leaderboard").where("timestamp", ">=", today).orderBy("timestamp", "desc")
         .orderBy("score", "desc").orderBy("durationSeconds", "asc")
         .limit(20)
         .get()
