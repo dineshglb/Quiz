@@ -47,6 +47,7 @@ body {
 }
 .q-card{padding:12px;font-size:14px;font-weight:500;line-height:1.4;}
 .drop-zone{
+  position: relative;
   border: 2px dashed rgba(0,0,0,0.1); border-radius: 16px; min-height: 64px;
   display:flex; flex-wrap:wrap; gap:6px; align-items:center; justify-content:center; padding:8px;
 }
@@ -54,6 +55,7 @@ body {
 .drop-zone.filled{border: 1px solid var(--color-accent); background: white;}
 .drop-zone.correct{border-color: var(--color-success); background: #e8f9ed;}
 .drop-zone.wrong{border-color: var(--color-error); background: #fdf2f2;}
+
 .drag-pool{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:2rem;justify-content: center;}
 .drag-chip{
   padding:10px 14px;font-size:13px;font-weight:600;cursor:grab;user-select:none; background: white; border-radius: 12px;
@@ -63,7 +65,27 @@ body {
 .btn-row{display:flex;gap:12px;justify-content:center;}
 .btn{padding:14px 24px;font-size:16px;font-weight:600;border-radius: 20px;cursor:pointer;flex:1;border:none;}
 .btn-primary{background: var(--color-accent);color:#fff;}
-.remove-btn{font-size:10px; color:var(--color-error); margin-left:6px; font-weight:bold;}
+
+/* CLEAR BUTTON STYLING */
+.clear-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 22px;
+  height: 22px;
+  background: var(--color-error);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(255,59,48,0.3);
+  z-index: 10;
+}
+
 .lb-container {text-align:left; margin-top:20px; background: white; border-radius:24px; padding:20px; max-height:350px; overflow-y:auto;}
 </style>
 </head>
@@ -196,6 +218,7 @@ function drop(e,idx){
   dragId = null;
 }
 
+// RESTORED: Single Clear Button Logic
 function updateZoneUI(idx) {
   const zone = document.getElementById('zone-' + idx);
   if (!zoneData[idx] || zoneData[idx].length === 0) {
@@ -203,19 +226,27 @@ function updateZoneUI(idx) {
     zone.innerHTML = `<span style="color:#ccc;font-size:11px;">Drop 2 here</span>`;
     return;
   }
+  
   zone.classList.add('filled');
-  zone.innerHTML = zoneData[idx].map((data, wordIdx) => `
-    <div class="glass-card" style="padding:4px 8px; font-size:12px; background:white; display:flex; align-items:center; cursor:pointer;" onclick="removeFromZone(${idx}, ${wordIdx})">
-      ${data.val} <span class="remove-btn">✕</span>
-    </div>
+  let content = zoneData[idx].map(data => `
+    <div class="glass-card" style="padding:4px 8px; font-size:12px; background:white;">${data.val}</div>
   `).join(' ');
+
+  // Add a single clear button for the whole zone
+  zone.innerHTML = `${content} <div class="clear-btn" onclick="clearZone(${idx})">✕</div>`;
 }
 
-function removeFromZone(zoneIdx, wordIdx) {
+function clearZone(idx) {
   if (checked) return;
-  const removedChip = zoneData[zoneIdx].splice(wordIdx, 1)[0];
-  document.getElementById(removedChip.id).classList.remove('used');
-  updateZoneUI(zoneIdx);
+  if (zoneData[idx]) {
+    // Put all chips back in the pool
+    zoneData[idx].forEach(chip => {
+      document.getElementById(chip.id).classList.remove('used');
+    });
+    // Reset data
+    zoneData[idx] = [];
+    updateZoneUI(idx);
+  }
 }
 
 function checkAnswers(){
@@ -226,6 +257,10 @@ function checkAnswers(){
   
   r.pairs.forEach((p, i) => {
     const zone = document.getElementById('zone-' + i);
+    // Remove clear button before checking
+    const clearBtn = zone.querySelector('.clear-btn');
+    if(clearBtn) clearBtn.remove();
+
     const placed = zoneData[i] ? zoneData[i].map(d => d.val).join(' ') : "";
     if(placed === p.a){
       zone.className = 'drop-zone correct';
