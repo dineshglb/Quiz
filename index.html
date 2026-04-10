@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Murli Drag Quiz</title>
+<title>Murli Drag Quiz - Competitive Mode</title>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
@@ -11,160 +11,74 @@
 <script src="https://cdn.jsdelivr.net/npm/mobile-drag-drop@2.3.0-beta.2/index.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mobile-drag-drop@2.3.0-beta.2/scroll-behaviour.min.js"></script>
 <script>
-  // Initialize touch polyfill with Auto-Scroll turned on
   MobileDragDrop.polyfill({ 
       holdToDrag: 0,
       dragImageTranslateOverride: MobileDragDrop.scrollBehaviourDragImageTranslateOverride
   });
-  // Prevent screen scrolling while dragging
   window.addEventListener('touchmove', function() {}, {passive: false});
 </script>
 
 <style>
 :root {
-  var(--font-sans): -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  var(--glass-bg): rgba(255, 255, 255, 0.55);
-  var(--glass-border): rgba(255, 255, 255, 0.8);
-  var(--glass-shadow): 0 8px 32px rgba(0, 0, 0, 0.06);
-  var(--color-text-primary): #1d1d1f; 
-  var(--color-text-secondary): #515154;
-  var(--color-text-tertiary): #86868b;
-  var(--color-accent): #007aff; 
-  var(--color-success): #34c759; 
-  var(--color-error): #ff3b30; 
-  var(--border-radius-md): 16px; 
-  var(--border-radius-lg): 24px;
+  --color-accent: #007aff; 
+  --color-success: #34c759; 
+  --color-error: #ff3b30; 
 }
-
 *{box-sizing:border-box;margin:0;padding:0;}
-
 body { 
   background-color: #f2f2f7;
-  background-image: 
-    radial-gradient(circle at 15% 10%, #dcd3ff 0%, transparent 40%),
-    radial-gradient(circle at 85% 20%, #c4e0ff 0%, transparent 40%),
-    radial-gradient(circle at 50% 80%, #ffd1e8 0%, transparent 40%);
+  background-image: radial-gradient(circle at 15% 10%, #dcd3ff 0%, transparent 40%), radial-gradient(circle at 85% 20%, #c4e0ff 0%, transparent 40%);
   background-attachment: fixed;
-  -webkit-tap-highlight-color: transparent; 
-  overscroll-behavior-y: none; /* Stops pull-to-refresh while dragging */
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: -apple-system, sans-serif;
 }
-
 .wrap{padding:2rem 1.25rem;max-width:640px;margin:auto;min-height: 100vh;}
 .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;}
-.lbl{font-size:14px;font-weight:500;color: #515154;}
-.scr{font-size:17px;font-weight:700;color:#1d1d1f;letter-spacing:-0.5px;}
-
+.scr{font-size:17px;font-weight:700;}
 .prog-bg{height:8px;background:rgba(0,0,0,0.05);border-radius:4px;margin-bottom:1.5rem;overflow:hidden;}
-.prog-fill{height:8px;background:#007aff;border-radius:4px;transition:width 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);}
-.round-lbl{font-size:14px;color:#515154;margin-bottom:1.25rem;text-align:center;font-weight:500;}
-
-.col-head-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
-.col-head{font-size:12px;font-weight:600;color:#86868b;text-align:center;text-transform:uppercase;letter-spacing:1px;}
-
+.prog-fill{height:8px;background:var(--color-accent);transition:width 0.4s;}
 .match-list{display:flex;flex-direction:column;gap:12px;margin-bottom:2rem;}
-.match-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-
-/* GLASSMORPHISM CLASSES */
+.match-row{display:grid;grid-template-columns: 1.2fr 1fr;gap:12px;}
 .glass-card {
-  background: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
   border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
-
-.q-card{padding:14px 16px;font-size:14px;font-weight:500;color:#1d1d1f;line-height:1.4;display:flex;align-items:center;}
-
+.q-card{padding:12px;font-size:14px;font-weight:500;line-height:1.4;}
 .drop-zone{
-  background: rgba(255,255,255,0.3);
-  border: 2px dashed rgba(0,0,0,0.1);
-  border-radius: 16px;
-  padding:10px 12px;
-  font-size:14px;
-  font-weight:500;
-  color:#86868b;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  transition:all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
-  min-height: 56px;
+  border: 2px dashed rgba(0,0,0,0.1); border-radius: 16px; min-height: 60px;
+  display:flex; flex-wrap:wrap; gap:4px; align-items:center; justify-content:center; padding:5px;
 }
-
-.drop-zone.over{background:rgba(0, 122, 255, 0.1); border-color:#007aff; transform: scale(1.02);}
-
-.drop-zone.filled{
-  background: rgba(255, 255, 255, 0.55);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid #007aff;
-  color:#007aff;
-  justify-content:space-between;
-  cursor:pointer;
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.1);
-}
-
-.drop-zone.correct{background: rgba(52, 199, 89, 0.15); border-color: #34c759; color: #1a6e30;}
-.drop-zone.wrong{background: rgba(255, 59, 48, 0.15); border-color: #ff3b30; color: #8a1913;}
-
-.drag-pool{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:2rem;justify-content: center;}
+.drop-zone.over{background:rgba(0, 122, 255, 0.1); border-color:var(--color-accent);}
+.drop-zone.filled{border: 1px solid var(--color-accent); background: white;}
+.drop-zone.correct{border-color: var(--color-success); background: #e8f9ed;}
+.drop-zone.wrong{border-color: var(--color-error); background: #fdf2f2;}
+.drag-pool{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:2rem;justify-content: center;}
 .drag-chip{
-  padding:12px 18px;font-size:15px;font-weight:500;color:#1d1d1f;cursor:grab;user-select:none;transition:all 0.2s;touch-action: none;
-} 
-.drag-chip:active{transform: scale(0.95); background: rgba(255,255,255,0.8);}
-.drag-chip.dragging{opacity:0.6; transform: scale(1.1); box-shadow: 0 15px 30px rgba(0,0,0,0.15);}
-.drag-chip.used{display:none;}
-
-.btn-row{display:flex;gap:12px;justify-content:center;margin-top:1rem;}
-.btn{
-  padding:14px 24px;font-size:16px;font-weight:600;border-radius: 20px;cursor:pointer;
-  border: 1px solid rgba(0,0,0,0.1);background: rgba(255,255,255,0.5);
-  backdrop-filter: blur(10px);-webkit-backdrop-filter: blur(10px);
-  color:#1d1d1f;flex:1;max-width: 180px;transition:all 0.2s;
+  padding:10px 14px;font-size:14px;font-weight:600;cursor:grab;user-select:none; background: white; border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
-.btn:active{transform: scale(0.96);}
-.btn-primary{background: #007aff;color:#fff;border:none;box-shadow: 0 4px 15px rgba(0, 122, 255, 0.4);}
-.btn-primary:active{background: #005bb5;}
-
-.remove-btn{font-size:12px;color:#007aff;cursor:pointer;padding:4px 8px;background: rgba(0,122,255,0.1);border-radius:12px;transition:background 0.2s;}
-
-.final-card{padding:3rem 1.5rem;text-align:center;border-radius:24px;}
-.final-score{font-size:56px;font-weight:700;letter-spacing:-1px;color:#1d1d1f;margin:1rem 0;}
-.final-msg{font-size:17px;font-weight:500;color:#515154;margin-bottom:1.5rem;}
-.badge{display:inline-block;padding:6px 14px;border-radius: 16px;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;background:#007aff;color:#fff;box-shadow: 0 4px 12px rgba(0,122,255,0.3);}
-
-.lb-container {text-align:left; margin-top:20px; background: rgba(255,255,255,0.4); border-radius:24px; padding:20px;max-height: 350px;overflow-y: auto;}
-.lb-title {font-size:16px; margin-bottom:15px; color:#1d1d1f; text-align:center; font-weight:700;}
-.lb-item {margin-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 8px;}
-.lb-name { font-weight:600; font-size:15px; }
-.lb-date { color:#86868b; font-size:12px; font-weight:500; }
-.lb-score { font-weight:700; color:#007aff; font-size:15px; }
-
-@media (max-width: 360px) {
-  .col-head-row { display: none; } 
-  .match-row { display: flex; flex-direction: column; gap: 6px; padding-bottom: 16px; border-bottom: 1px solid rgba(0,0,0,0.05); }
-  .q-card { border: none; padding: 6px 4px; background: transparent; box-shadow: none; backdrop-filter:none;}
-  .drop-zone { width: 100%; }
-}
+.drag-chip.used{opacity: 0.3; pointer-events: none;}
+.btn-row{display:flex;gap:12px;justify-content:center;}
+.btn{padding:14px 24px;font-size:16px;font-weight:600;border-radius: 20px;cursor:pointer;flex:1;border:none;}
+.btn-primary{background: var(--color-accent);color:#fff;}
+.remove-btn{font-size:10px; color:var(--color-error); margin-left:4px; cursor:pointer;}
+.lb-container {text-align:left; margin-top:20px; background: white; border-radius:24px; padding:20px; max-height:300px; overflow-y:auto;}
 </style>
 </head>
 <body>
 
 <div class="wrap">
   <div class="topbar">
-    <span class="lbl" id="rlbl">Round 1 / 2</span>
+    <span id="rlbl">Round 1 / 2</span>
     <span class="scr" id="scr">Score: 0</span>
   </div>
-  <div class="prog-bg"><div class="prog-fill" id="prog" style="width:50%"></div></div>
+  <div class="prog-bg"><div class="prog-fill" id="prog"></div></div>
   <div id="game-area"></div>
 </div>
 
 <script>
-// ==========================================
-// 1. FIREBASE SETUP
-// !!! PASTE YOUR FIREBASE CONFIG HERE !!!
-// ==========================================
 const firebaseConfig = {
   apiKey: "AIzaSyDqoqpUFUkShdXMy21MEWhKsHKFlQUyNPo",
   authDomain: "murliquizleaderboard.firebaseapp.com",
@@ -177,229 +91,140 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-// ==========================================
 
 const rounds = [
   {
     pairs:[
-      {q:"ஆத்மாக்களின் தீபம் அணைந்துள்ளதால், மனிதர்கள் இறந்த பின் எத்தனை நாட்கள் தீபம் ஏற்றுகிறார்கள்?", a:"12 நாட்கள்"},
-      {q:"பாரதவாசிகளாகிய நீங்கள் பகலில் இருந்தீர்கள்; இப்போது எதில் இருப்பதாக பாபா கூறுகிறார்?", a:"இரவில் இருக்கிறீர்கள்"},
-      {q:"தசராவைப் பற்றிய கதைகள் எதற்காக உருவாக்கப்படுகின்றன என பாபா இன்று விளக்குகிறார்?", a:"மனதை கவரும்"},
-      {q:"ஆத்மா ஒரு நட்சத்திரம் போன்றது; அது உடலில் எங்கு அமர்ந்திருப்பதாக இன்று கூறப்படுகிறது?", a:"புருவ மத்தியில்"},
-      {q:"பாபா இன்று குறிப்பிட்ட பழைய உலகத்தின் மீதான வைராக்கியம் எதனால் ஏற்படுகிறது?", a:"ஞானத்தினால் வருகிறது"}
-    ]
+      {q:"ஆத்மாவிற்கு புருவ மத்தியில் பிரகாசிக்கும் என்று எதனைச் சொல்கிறார்கள்?", a:"நட்சத்திரம் போன்றது"},
+      {q:"தந்தையிடம் சந்திக்க வரும்போது எத்தனை வருடங்களுக்கு முன் சந்தித்தோம் என்பீர்கள்?", a:"ஐயாயிரம் ஆண்டுகள்"},
+      {q:"அல்லா என்ற வார்த்தைக்கு இணையாக முரளியில் வரும் மற்றொரு வார்த்தை?", a:"அல்ஃப் பே"},
+      {q:"கங்கை வெளிப்பட்டது என்று சொல்வதற்கு எதனை எய்தார்கள் எனப்படுகிறது?", a:"ஞான அம்பு"},
+      {q:"சிவபாபாவின் மகிமையை போர்டில் எழுதும்போது முதலில் என்ன பட்டம் வர வேண்டும்?", a:"பதீத பாவனர்"}
+    ],
+    extraDistractors: ["ஜோதி", "சுரூபம்", "ஆயிரம்", "யுகங்கள்", "வில்", "வித்தை"]
   },
   {
     pairs:[
-      {q:"இந்த நாடகத்தில் யாருடைய விளையாட்டு உருவாக்கப்பட்டிருக்கிறது? யார் பழைய எதிரி?", a:"இந்த இராவணன்"},
-      {q:"சத்யுகத்தில் அகால மரணம் கிடையாது என்பதால், நீங்கள் எதன் மீது வெற்றி பெறுகிறீர்கள்?", a:"காலன் மீது"},
-      {q:"ஆத்மாக்களின் தந்தை சிவன் என்றால், மற்ற ஆத்மாக்களை பாபா இன்று எவ்வாறு அழைக்கிறார்?", a:"சாலிகிராம் ஆத்மாக்கள்"},
-      {q:"வரதானத்தின் படி, சாக்ஷாத்கார மூர்த்தியாக மாற எத்தகைய திருஷ்டி நமக்கு அவசியம்?", a:"சதோகுண திருஷ்டி"},
-      {q:"உலகம் உங்கள் முன்னால் பணிய வேண்டும் என்றால், உங்கள் எண்ணங்களில் எதனை நீக்க வேண்டும்?", a:"பணியவைக்கும் எண்ணம்"}
-    ]
+      {q:"காட்ரெஜ் (Godrej) என்று எதனை உவமைப்படுத்தி முரளியில் பாபா கூறுகிறார்?", a:"ஞானப் பூட்டை"},
+      {q:"சகோதர சகோதரிகளே வந்து புரிந்துகொள்ளுங்கள் என அழைப்பதற்கு முன் என்ன செய்ய வேண்டும்?", a:"ஞான மனனம்"},
+      {q:"கன்னிகை புகுந்த வீடு செல்லும்போது எதனை விட்டுச் செல்கிறாள் எனப்படுகிறது?", a:"பழைய ஆடைகள்"},
+      {q:"பாரதத்தின் படகு கீழே சென்றதை மீட்டதை எந்த கதையில் காண்பிக்கிறார்கள்?", a:"நாராயணர் கதை"},
+      {q:"வெற்றி அடையக்கூடியவர் ஒவ்வொரு விஷயத்திலும் தன்னை என்னவாக ஆக்கிக்கொள்வார்?", a:"இனிமையானவராக மாறுவார்"}
+    ],
+    extraDistractors: ["பழைய", "பூமி", "ஆத்ம", "சிந்தனை", "புதிய", "கலைகள்"]
   }
 ];
 
-// ADDED startTime variable to track when the quiz begins
 let round=0, score=0, zoneData={}, dragId=null, checked=false, startTime=null;
 
 function shuffle(arr){return [...arr].sort(()=>Math.random()-0.5);}
 
 function render(){
   const area=document.getElementById('game-area');
-  
-  // Start the timer when the first round renders
-  if(startTime === null) {
-      startTime = Date.now();
-  }
+  if(startTime === null) startTime = Date.now();
 
   if(round>=rounds.length){
-    // CALCULATE TIME TAKEN
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); 
-    const endTime = Date.now();
-    const durationMs = endTime - startTime;
-    const totalSeconds = Math.floor(durationMs / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    const timeTakenStr = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
+    const today = new Date(); today.setHours(0,0,0,0);
+    const totalSeconds = Math.floor((Date.now() - startTime) / 1000);
+    area.innerHTML = `<div class="glass-card" style="padding:20px;text-align:center;">Saving Result...</div>`;
+    let playerName = prompt("Game Over! Enter your name:") || "Player";
 
-    // Loading State
-    area.innerHTML = `<div class="final-card glass-card"><div class="final-msg">Launching Leaderboard...</div></div>`;
-
-    let playerName = prompt("Game Over! Enter your name:") || "Anonymous Player";
-    
-    // Save to Firebase (Now includes timeTaken and durationSeconds)
     db.collection("leaderboard").add({
-      name: playerName.substring(0, 20), 
-      score: score,
-      timeTaken: timeTakenStr,
-      durationSeconds: totalSeconds,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      name: playerName.substring(0, 20), score: score,
+      durationSeconds: totalSeconds, timestamp: firebase.firestore.FieldValue.serverTimestamp()
     }).then(() => {
-      // Fetch Top Leaderboard (You can update "desc" to "asc" if you want to sort by something else later)
-      db.collection("leaderboard").where("timestamp", ">=", today).orderBy("timestamp", "desc")
-        .orderBy("score", "desc").orderBy("durationSeconds", "asc")
-        .limit(20)
-        .get()
-        .then((snapshot) => {
-          let boardHTML = `<div class="lb-container">`;
-          boardHTML += `<h3 class="lb-title">TOP SCORERS</h3>`;
-          boardHTML += `<ol style="padding-left:0; list-style-position: inside; margin:0;">`;
-          
-          snapshot.forEach((doc) => {
-            let data = doc.data();
-            let timeString = "";
-            if (data.timestamp) {
-                let dateObj = data.timestamp.toDate();
-                timeString = dateObj.toLocaleDateString() + ", " + dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            }
-            
-            // Add Time Taken display if it exists in the database
-            let timeTakenDisplay = data.timeTaken ? ` &bull; ⏱️ ${data.timeTaken}` : "";
+      db.collection("leaderboard").where("timestamp", ">=", today).orderBy("timestamp", "desc").limit(30).get().then((snapshot) => {
+          let scoresArr = [];
+          snapshot.forEach(doc => scoresArr.push(doc.data()));
+          scoresArr.sort((a,b) => b.score - a.score || a.durationSeconds - b.durationSeconds);
 
-            boardHTML += `
-              <li class="lb-item">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                  <span>
-                    <div class="lb-name">${data.name}</div> 
-                    <div class="lb-date">${timeString}${timeTakenDisplay}</div>
-                  </span>
-                  <span class="lb-score">${data.score} pts</span>
-                </div>
-              </li>`;
+          let boardHTML = `<div class="lb-container"><h3 style="text-align:center;margin-bottom:10px;">TODAY'S TOP SCORERS</h3>`;
+          scoresArr.slice(0,10).forEach(d => {
+            boardHTML += `<div style="display:flex;justify-content:space-between;border-bottom:1px solid #eee;padding:8px 0;">
+              <span><b>${d.name}</b><br><small>${d.durationSeconds}s</small></span>
+              <span style="color:#007aff;font-weight:700;">${d.score} pts</span>
+            </div>`;
           });
-          
-          boardHTML += `</ol></div>`;
-
-          // Render Final Screen
-          area.innerHTML=`<div class="final-card glass-card">
-            <div class="badge">Murli Drag Quiz</div>
-            <div class="final-score">${score} <span style="font-size:32px; color:#86868b">/ ${rounds.reduce((s,r)=>s+r.pairs.length,0)}</span></div>
-            <div class="final-msg">Completed in: <strong>${timeTakenStr}</strong><br><br>${score>=8?'Wow! Excellent!':score>=5?'Good effort! Keep practicing.':'Try again!'}</div>
-            
-            ${boardHTML}
-
-            <button class="btn btn-primary" style="margin-top:24px; width:100%; max-width:none;" onclick="restart()">Play Again</button>
-          </div>`;
+          area.innerHTML=`<div class="glass-card" style="padding:20px;text-align:center;">
+            <h2>Score: ${score} / 10</h2>
+            ${boardHTML}</div>
+            <button class="btn btn-primary" style="margin-top:15px;width:100%" onclick="location.reload()">Play Again</button></div>`;
       });
-    }).catch((error) => {
-      console.error("Error saving score: ", error);
-      area.innerHTML = `<div class="final-card glass-card"><div class="final-msg">Connection Error. Couldn't load leaderboard.</div><button class="btn btn-primary" onclick="restart()">Play Again</button></div>`;
     });
-    
     return;
   }
-  
-  checked=false;
-  zoneData={};
-  const r=rounds[round];
-  const answers=shuffle(r.pairs.map(p=>p.a));
-  document.getElementById('rlbl').textContent=`Round ${round+1} of ${rounds.length}`;
-  document.getElementById('prog').style.width=((round+1)/rounds.length*100)+'%';
 
-  let rowsHTML='';
-  r.pairs.forEach((p,i)=>{
-    rowsHTML+=`
+  const r = rounds[round];
+  zoneData = {}; checked = false;
+  document.getElementById('rlbl').textContent = `Round ${round+1} / 2`;
+  document.getElementById('prog').style.width = ((round+1)/2*100)+'%';
+
+  let allWords = r.pairs.map(p => p.a.split(' ')).flat();
+  if(r.extraDistractors) allWords = allWords.concat(r.extraDistractors);
+  const pool = shuffle(allWords);
+
+  let rowsHTML = r.pairs.map((p,i) => `
     <div class="match-row">
       <div class="q-card glass-card">${p.q}</div>
-      <div class="drop-zone" id="zone-${i}" data-idx="${i}" 
-        ondragover="ev(event)" ondragleave="el(event)" ondrop="drop(event,${i})">
-        <span>Drop here</span>
+      <div class="drop-zone" id="zone-${i}" ondragover="ev(event)" ondragleave="el(event)" ondrop="drop(event,${i})">
+        <span style="color:#ccc;font-size:12px;">Drop 2 bubbles here</span>
       </div>
-    </div>`;
-  });
+    </div>`).join('');
 
-  let chipsHTML='';
-  answers.forEach((a,i)=>{
-    chipsHTML+=`<div class="drag-chip glass-card" id="chip-${i}" draggable="true"
-      ondragstart="ds(event,'${a}','chip-${i}')"
-      ondragend="de(event)">${a}</div>`;
-  });
-
-  area.innerHTML=`
-    <div class="round-lbl"><h3>OM SHANTI</h3></div>
-    <div class="round-lbl">Drag the correct answer and drop it next to the question</div>
-    <div class="col-head-row">
-      <div class="col-head">Question</div>
-      <div class="col-head">Answer</div>
-    </div>
+  area.innerHTML = `
     <div class="match-list">${rowsHTML}</div>
-    <div class="col-head" style="margin-bottom:12px;">Options</div>
-    <div class="drag-pool">${chipsHTML}</div>
-    <div class="btn-row">
-      <button class="btn btn-primary" onclick="checkAnswers()">Check Answers</button>
-      <button class="btn" onclick="resetRound()">Reset</button>
-    </div>
-  `;
+    <div class="drag-pool">${pool.map((w,i)=>`<div class="drag-chip" id="chip-${i}" draggable="true" ondragstart="ds(event,'${w}','chip-${i}')">${w}</div>`).join('')}</div>
+    <div class="btn-row"><button class="btn btn-primary" onclick="checkAnswers()">Check Answers</button></div>`;
 }
 
-function ds(e,val,chipId){dragId={val,chipId};e.target.classList.add('dragging');}
-function de(e){e.target.classList.remove('dragging');}
-function ev(e){e.preventDefault();e.currentTarget.classList.add('over');}
-function el(e){e.currentTarget.classList.remove('over');}
+function ds(e,val,id){ dragId={val,id}; }
+function ev(e){ e.preventDefault(); e.currentTarget.classList.add('over'); }
+function el(e){ e.currentTarget.classList.remove('over'); }
 
 function drop(e,idx){
   e.preventDefault();
-  e.currentTarget.classList.remove('over');
-  if(!dragId||checked)return;
-  const prev=zoneData[idx];
-  if(prev){
-    const oldChip=document.getElementById(prev.chipId);
-    if(oldChip)oldChip.classList.remove('used');
-  }
-  zoneData[idx]=dragId;
-  const chip=document.getElementById(dragId.chipId);
-  if(chip)chip.classList.add('used');
-  const zone=document.getElementById('zone-'+idx);
-  zone.className='drop-zone filled';
-  zone.innerHTML=`<span>${dragId.val}</span><span class="remove-btn" onclick="removeFromZone(${idx})">✕</span>`;
-  dragId=null;
-}
+  const zone = e.currentTarget;
+  zone.classList.remove('over');
+  if(!dragId || checked) return;
+  
+  if(!zoneData[idx]) zoneData[idx] = [];
+  if(zoneData[idx].length >= 2) return; // Only 2 words per answer
 
-function removeFromZone(idx){
-  if(checked)return;
-  const d=zoneData[idx];
-  if(!d)return;
-  const chip=document.getElementById(d.chipId);
-  if(chip)chip.classList.remove('used');
-  delete zoneData[idx];
-  const zone=document.getElementById('zone-'+idx);
-  zone.className='drop-zone';
-  zone.innerHTML=`<span>Drop here</span>`;
+  zoneData[idx].push(dragId);
+  document.getElementById(dragId.id).classList.add('used');
+  
+  zone.classList.add('filled');
+  zone.innerHTML = zoneData[idx].map((d, i) => 
+    `<span class="glass-card" style="padding:4px 8px;font-size:12px;background:white;">${d.val}</span>`
+  ).join(' ');
+  dragId = null;
 }
 
 function checkAnswers(){
-  if(checked)return;
-  checked=true;
-  const r=rounds[round];
-  let gained=0;
-  r.pairs.forEach((p,i)=>{
-    const zone=document.getElementById('zone-'+i);
-    const placed=zoneData[i];
-    if(placed && placed.val===p.a){
-      zone.className='drop-zone correct glass-card';
-      zone.innerHTML=`<span>${placed.val}</span><span style="font-size:16px;">✓</span>`;
+  if(checked) return;
+  checked = true;
+  const r = rounds[round];
+  let gained = 0;
+  
+  r.pairs.forEach((p, i) => {
+    const zone = document.getElementById('zone-' + i);
+    const placed = zoneData[i] ? zoneData[i].map(d => d.val).join(' ') : "";
+    if(placed === p.a){
+      zone.className = 'drop-zone correct';
       gained++;
     } else {
-      zone.className='drop-zone wrong glass-card';
-      const shown=placed?placed.val:'—';
-      zone.innerHTML=`<span style="text-decoration:line-through">${shown}</span><span style="font-size:13px;margin-left:6px;font-weight:600;">→ ${p.a}</span>`;
+      zone.className = 'drop-zone wrong';
+      zone.innerHTML = `<small style="color:red;font-size:10px;">Correct: ${p.a}</small>`;
     }
   });
-  score+=gained;
-  document.getElementById('scr').textContent=`Score: ${score}`;
-  const btnRow=document.querySelector('.btn-row');
-  btnRow.innerHTML=`<button class="btn btn-primary" style="width:100%; max-width:none;" onclick="nextRound()">${round<rounds.length-1?'Next Round →':'View Results'}</button>`;
+  
+  score += gained;
+  document.getElementById('scr').textContent = `Score: ${score}`;
+  const btnRow = document.querySelector('.btn-row');
+  btnRow.innerHTML = `<button class="btn btn-primary" style="width:100%" onclick="nextRound()">${round<1?'Next Round':'View Results'}</button>`;
 }
 
-function nextRound(){round++;render();}
-function resetRound(){zoneData={};render();}
-
-// ADDED: Reset startTime to null when they replay so the timer resets
-function restart(){round=0;score=0;startTime=null;render();}
-
-// Start the game!
+function nextRound(){ round++; render(); }
 render();
 </script>
 </body>
