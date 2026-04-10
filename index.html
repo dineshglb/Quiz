@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Murli Drag Quiz - Competitive Mode</title>
+<title>Murli Drag Quiz - 10-04-2026</title>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
@@ -31,15 +31,15 @@ body {
   background-attachment: fixed;
   font-family: -apple-system, sans-serif;
 }
-.wrap{padding:2rem 1.25rem;max-width:640px;margin:auto;min-height: 100vh;}
+.wrap{padding:1.5rem 1rem;max-width:600px;margin:auto;min-height: 100vh;}
 .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;}
 .scr{font-size:17px;font-weight:700;}
 .prog-bg{height:8px;background:rgba(0,0,0,0.05);border-radius:4px;margin-bottom:1.5rem;overflow:hidden;}
 .prog-fill{height:8px;background:var(--color-accent);transition:width 0.4s;}
 .match-list{display:flex;flex-direction:column;gap:12px;margin-bottom:2rem;}
-.match-row{display:grid;grid-template-columns: 1.2fr 1fr;gap:12px;}
+.match-row{display:grid;grid-template-columns: 1.1fr 1fr;gap:10px;}
 .glass-card {
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.65);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.8);
   border-radius: 16px;
@@ -47,8 +47,8 @@ body {
 }
 .q-card{padding:12px;font-size:14px;font-weight:500;line-height:1.4;}
 .drop-zone{
-  border: 2px dashed rgba(0,0,0,0.1); border-radius: 16px; min-height: 60px;
-  display:flex; flex-wrap:wrap; gap:4px; align-items:center; justify-content:center; padding:5px;
+  border: 2px dashed rgba(0,0,0,0.1); border-radius: 16px; min-height: 64px;
+  display:flex; flex-wrap:wrap; gap:6px; align-items:center; justify-content:center; padding:8px;
 }
 .drop-zone.over{background:rgba(0, 122, 255, 0.1); border-color:var(--color-accent);}
 .drop-zone.filled{border: 1px solid var(--color-accent); background: white;}
@@ -56,15 +56,15 @@ body {
 .drop-zone.wrong{border-color: var(--color-error); background: #fdf2f2;}
 .drag-pool{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:2rem;justify-content: center;}
 .drag-chip{
-  padding:10px 14px;font-size:14px;font-weight:600;cursor:grab;user-select:none; background: white; border-radius: 12px;
+  padding:10px 14px;font-size:13px;font-weight:600;cursor:grab;user-select:none; background: white; border-radius: 12px;
   border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
-.drag-chip.used{opacity: 0.3; pointer-events: none;}
+.drag-chip.used{opacity: 0.2; pointer-events: none;}
 .btn-row{display:flex;gap:12px;justify-content:center;}
 .btn{padding:14px 24px;font-size:16px;font-weight:600;border-radius: 20px;cursor:pointer;flex:1;border:none;}
 .btn-primary{background: var(--color-accent);color:#fff;}
-.remove-btn{font-size:10px; color:var(--color-error); margin-left:4px; cursor:pointer;}
-.lb-container {text-align:left; margin-top:20px; background: white; border-radius:24px; padding:20px; max-height:300px; overflow-y:auto;}
+.remove-btn{font-size:10px; color:var(--color-error); margin-left:6px; font-weight:bold;}
+.lb-container {text-align:left; margin-top:20px; background: white; border-radius:24px; padding:20px; max-height:350px; overflow-y:auto;}
 </style>
 </head>
 <body>
@@ -126,27 +126,27 @@ function render(){
   if(round>=rounds.length){
     const today = new Date(); today.setHours(0,0,0,0);
     const totalSeconds = Math.floor((Date.now() - startTime) / 1000);
-    area.innerHTML = `<div class="glass-card" style="padding:20px;text-align:center;">Saving Result...</div>`;
+    area.innerHTML = `<div class="glass-card" style="padding:20px;text-align:center;">Finalizing Results...</div>`;
     let playerName = prompt("Game Over! Enter your name:") || "Player";
 
     db.collection("leaderboard").add({
       name: playerName.substring(0, 20), score: score,
       durationSeconds: totalSeconds, timestamp: firebase.firestore.FieldValue.serverTimestamp()
     }).then(() => {
-      db.collection("leaderboard").where("timestamp", ">=", today).orderBy("timestamp", "desc").limit(30).get().then((snapshot) => {
+      db.collection("leaderboard").where("timestamp", ">=", today).orderBy("timestamp", "desc").get().then((snapshot) => {
           let scoresArr = [];
           snapshot.forEach(doc => scoresArr.push(doc.data()));
           scoresArr.sort((a,b) => b.score - a.score || a.durationSeconds - b.durationSeconds);
 
-          let boardHTML = `<div class="lb-container"><h3 style="text-align:center;margin-bottom:10px;">TODAY'S TOP SCORERS</h3>`;
-          scoresArr.slice(0,10).forEach(d => {
-            boardHTML += `<div style="display:flex;justify-content:space-between;border-bottom:1px solid #eee;padding:8px 0;">
-              <span><b>${d.name}</b><br><small>${d.durationSeconds}s</small></span>
-              <span style="color:#007aff;font-weight:700;">${d.score} pts</span>
+          let boardHTML = `<div class="lb-container"><h3 style="text-align:center;margin-bottom:15px;">TODAY'S TOP 10</h3>`;
+          scoresArr.slice(0,10).forEach((d, idx) => {
+            boardHTML += `<div style="display:flex;justify-content:space-between;border-bottom:1px solid #eee;padding:10px 0; font-size:14px;">
+              <span>${idx+1}. <b>${d.name}</b> <small style="color:#888;">(${d.durationSeconds}s)</small></span>
+              <span style="color:var(--color-accent);font-weight:700;">${d.score} pts</span>
             </div>`;
           });
           area.innerHTML=`<div class="glass-card" style="padding:20px;text-align:center;">
-            <h2>Score: ${score} / 10</h2>
+            <h2 style="margin-bottom:10px;">Result: ${score} / 10</h2>
             ${boardHTML}</div>
             <button class="btn btn-primary" style="margin-top:15px;width:100%" onclick="location.reload()">Play Again</button></div>`;
       });
@@ -167,7 +167,7 @@ function render(){
     <div class="match-row">
       <div class="q-card glass-card">${p.q}</div>
       <div class="drop-zone" id="zone-${i}" ondragover="ev(event)" ondragleave="el(event)" ondrop="drop(event,${i})">
-        <span style="color:#ccc;font-size:12px;">Drop 2 bubbles here</span>
+        <span style="color:#ccc;font-size:11px;">Drop 2 here</span>
       </div>
     </div>`).join('');
 
@@ -188,16 +188,34 @@ function drop(e,idx){
   if(!dragId || checked) return;
   
   if(!zoneData[idx]) zoneData[idx] = [];
-  if(zoneData[idx].length >= 2) return; // Only 2 words per answer
+  if(zoneData[idx].length >= 2) return; 
 
   zoneData[idx].push(dragId);
   document.getElementById(dragId.id).classList.add('used');
-  
-  zone.classList.add('filled');
-  zone.innerHTML = zoneData[idx].map((d, i) => 
-    `<span class="glass-card" style="padding:4px 8px;font-size:12px;background:white;">${d.val}</span>`
-  ).join(' ');
+  updateZoneUI(idx);
   dragId = null;
+}
+
+function updateZoneUI(idx) {
+  const zone = document.getElementById('zone-' + idx);
+  if (!zoneData[idx] || zoneData[idx].length === 0) {
+    zone.classList.remove('filled');
+    zone.innerHTML = `<span style="color:#ccc;font-size:11px;">Drop 2 here</span>`;
+    return;
+  }
+  zone.classList.add('filled');
+  zone.innerHTML = zoneData[idx].map((data, wordIdx) => `
+    <div class="glass-card" style="padding:4px 8px; font-size:12px; background:white; display:flex; align-items:center; cursor:pointer;" onclick="removeFromZone(${idx}, ${wordIdx})">
+      ${data.val} <span class="remove-btn">✕</span>
+    </div>
+  `).join(' ');
+}
+
+function removeFromZone(zoneIdx, wordIdx) {
+  if (checked) return;
+  const removedChip = zoneData[zoneIdx].splice(wordIdx, 1)[0];
+  document.getElementById(removedChip.id).classList.remove('used');
+  updateZoneUI(zoneIdx);
 }
 
 function checkAnswers(){
@@ -211,10 +229,14 @@ function checkAnswers(){
     const placed = zoneData[i] ? zoneData[i].map(d => d.val).join(' ') : "";
     if(placed === p.a){
       zone.className = 'drop-zone correct';
+      zone.innerHTML = `<span style="font-size:13px; font-weight:600;">${placed} ✓</span>`;
       gained++;
     } else {
       zone.className = 'drop-zone wrong';
-      zone.innerHTML = `<small style="color:red;font-size:10px;">Correct: ${p.a}</small>`;
+      zone.innerHTML = `<div style="display:flex; flex-direction:column; align-items:center; width:100%;">
+        <span style="text-decoration:line-through; font-size:10px; color:#888;">${placed || 'Empty'}</span>
+        <small style="color:var(--color-error); font-weight:bold; font-size:11px;">→ ${p.a}</small>
+      </div>`;
     }
   });
   
