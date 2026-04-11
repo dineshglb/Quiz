@@ -3,104 +3,123 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Murli Drag Quiz - 10-04-2026</title>
+<title>Murli Bubble Builder</title>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/mobile-drag-drop@2.3.0-beta.2/index.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/mobile-drag-drop@2.3.0-beta.2/scroll-behaviour.min.js"></script>
-<script>
-  MobileDragDrop.polyfill({ 
-      holdToDrag: 0,
-      dragImageTranslateOverride: MobileDragDrop.scrollBehaviourDragImageTranslateOverride
-  });
-  window.addEventListener('touchmove', function() {}, {passive: false});
-</script>
-
 <style>
-:root {
-  --color-accent: #007aff; 
-  --color-success: #34c759; 
-  --color-error: #ff3b30; 
-}
-*{box-sizing:border-box;margin:0;padding:0;}
-body { 
-  background-color: #f2f2f7;
-  background-image: radial-gradient(circle at 15% 10%, #dcd3ff 0%, transparent 40%), radial-gradient(circle at 85% 20%, #c4e0ff 0%, transparent 40%);
-  background-attachment: fixed;
-  font-family: -apple-system, sans-serif;
-}
-.wrap{padding:1.5rem 1rem;max-width:600px;margin:auto;min-height: 100vh;}
-.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;}
-.scr{font-size:17px;font-weight:700;}
-.prog-bg{height:8px;background:rgba(0,0,0,0.05);border-radius:4px;margin-bottom:1.5rem;overflow:hidden;}
-.prog-fill{height:8px;background:var(--color-accent);transition:width 0.4s;}
-.match-list{display:flex;flex-direction:column;gap:12px;margin-bottom:2rem;}
-.match-row{display:grid;grid-template-columns: 1.1fr 1fr;gap:10px;}
-.glass-card {
-  background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
-.q-card{padding:12px;font-size:14px;font-weight:500;line-height:1.4;}
-.drop-zone{
-  position: relative;
-  border: 2px dashed rgba(0,0,0,0.1); border-radius: 16px; min-height: 64px;
-  display:flex; flex-wrap:wrap; gap:6px; align-items:center; justify-content:center; padding:8px;
-}
-.drop-zone.over{background:rgba(0, 122, 255, 0.1); border-color:var(--color-accent);}
-.drop-zone.filled{border: 1px solid var(--color-accent); background: white;}
-.drop-zone.correct{border-color: var(--color-success); background: #e8f9ed;}
-.drop-zone.wrong{border-color: var(--color-error); background: #fdf2f2;}
+  :root {
+    --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --glass-bg: rgba(255, 255, 255, 0.55);
+    --glass-border: rgba(255, 255, 255, 0.8);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+    --color-text-primary: #1d1d1f; 
+    --color-text-secondary: #515154;
+    --color-text-tertiary: #86868b;
+    --color-accent: #007aff; 
+    --color-success: #34c759; 
+    --color-error: #ff3b30; 
+  }
 
-.drag-pool{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:2rem;justify-content: center;}
-.drag-chip{
-  padding:10px 14px;font-size:13px;font-weight:600;cursor:grab;user-select:none; background: white; border-radius: 12px;
-  border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-.drag-chip.used{opacity: 0.2; pointer-events: none;}
-.btn-row{display:flex;gap:12px;justify-content:center;}
-.btn{padding:14px 24px;font-size:16px;font-weight:600;border-radius: 20px;cursor:pointer;flex:1;border:none;}
-.btn-primary{background: var(--color-accent);color:#fff;}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* CLEAR BUTTON STYLING */
-.clear-btn {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  width: 22px;
-  height: 22px;
-  background: var(--color-error);
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: bold;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(255,59,48,0.3);
-  z-index: 10;
-}
+  body { 
+    background-color: #f2f2f7;
+    background-image: 
+      radial-gradient(circle at 15% 10%, #dcd3ff 0%, transparent 40%),
+      radial-gradient(circle at 85% 20%, #c4e0ff 0%, transparent 40%),
+      radial-gradient(circle at 50% 80%, #ffd1e8 0%, transparent 40%);
+    background-attachment: fixed;
+    -webkit-tap-highlight-color: transparent; 
+    font-family: var(--font-sans);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 20px 15px;
+  }
 
-.lb-container {text-align:left; margin-top:20px; background: white; border-radius:24px; padding:20px; max-height:350px; overflow-y:auto;}
+  #app { width: 100%; max-width: 600px; }
+
+  .glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: 24px;
+    padding: 24px 20px;
+  }
+
+  .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .lbl { font-size: 14px; font-weight: 600; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+  .scr { font-size: 16px; font-weight: 700; color: var(--color-text-primary); }
+
+  .prog-bg { height: 6px; background: rgba(0,0,0,0.05); border-radius: 3px; margin-bottom: 24px; overflow: hidden; }
+  .prog-fill { height: 100%; background: var(--color-accent); transition: width 0.4s cubic-bezier(0.25, 0.1, 0.25, 1); }
+
+  .question-text {
+    font-size: 18px; font-weight: 600; color: var(--color-text-primary);
+    line-height: 1.5; margin-bottom: 24px; text-align: center; min-height: 54px;
+  }
+
+  .answer-area {
+    min-height: 70px; background: rgba(255, 255, 255, 0.4);
+    border: 2px dashed rgba(0,0,0,0.15); border-radius: 20px;
+    display: flex; flex-wrap: wrap; gap: 10px; padding: 12px;
+    margin-bottom: 30px; justify-content: center; align-items: center;
+  }
+
+  .bubble-pool { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; min-height: 120px; }
+
+  .bubble {
+    background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 20px; padding: 12px 18px; font-size: 16px; font-weight: 500;
+    color: var(--color-text-primary); cursor: pointer; user-select: none;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: transform 0.1s;
+  }
+
+  .bubble:active { transform: scale(0.95); }
+  .answer-area .bubble { background: var(--color-accent); color: white; border-color: var(--color-accent); }
+
+  .success-flash { background: rgba(52, 199, 89, 0.15); border-color: var(--color-success); }
+  .success-flash .bubble { background: var(--color-success); border-color: var(--color-success); }
+
+  .error-shake { animation: shake 0.4s both; background: rgba(255, 59, 48, 0.15); border-color: var(--color-error); }
+  .error-shake .bubble { background: var(--color-error); border-color: var(--color-error); }
+
+  @keyframes shake {
+    10%, 90% { transform: translate3d(-2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+    40%, 60% { transform: translate3d(6px, 0, 0); }
+  }
+
+  .hidden { visibility: hidden; opacity: 0; pointer-events: none; position: absolute; }
+  .locked { pointer-events: none; }
+
+  .final-score { font-size: 56px; font-weight: 700; color: var(--color-text-primary); margin: 10px 0; }
+  .btn-primary { 
+    padding: 16px 24px; font-size: 16px; font-weight: 600; border-radius: 24px; 
+    cursor: pointer; background: var(--color-accent); color: white; border: none; 
+    width: 100%; transition: transform 0.2s; 
+  }
+
+  .lb-container { text-align: left; margin-top: 20px; background: rgba(255,255,255,0.4); border-radius: 20px; padding: 20px; max-height: 350px; overflow-y: auto; }
+  .lb-title { font-size: 16px; margin-bottom: 15px; text-align: center; font-weight: 700; }
+  .lb-item { margin-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 8px; }
+  .lb-name { font-weight: 600; font-size: 15px; }
+  .lb-date { color: var(--color-text-tertiary); font-size: 12px; }
+  .lb-score { font-weight: 700; color: var(--color-accent); font-size: 15px; }
 </style>
 </head>
 <body>
 
-<div class="wrap">
-  <div class="topbar">
-    <span id="rlbl">Round 1 / 2</span>
-    <span class="scr" id="scr">Score: 0</span>
-  </div>
-  <div class="prog-bg"><div class="prog-fill" id="prog"></div></div>
-  <div id="game-area"></div>
-</div>
+<div id="app"></div>
 
 <script>
+// ==========================================
+// 1. FIREBASE SETUP
+// ==========================================
 const firebaseConfig = {
   apiKey: "AIzaSyDqoqpUFUkShdXMy21MEWhKsHKFlQUyNPo",
   authDomain: "murliquizleaderboard.firebaseapp.com",
@@ -114,175 +133,139 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-const rounds = [
-  {
-    pairs:[
-      {q:"ஆத்மாவிற்கு புருவ மத்தியில் _____ _______ என்று சொல்கிறார்கள்?", a:"பிரகாசிக்கும் நட்சத்திரம்"},
-      {q:"தந்தையிடம் சந்திக்க வரும்போது எதற்கு முன் சந்தித்தோம் என்பீர்கள்?", a:"ஐயாயிரம் ஆண்டுகள்"},
-      {q:"இராவண இராஜ்யத்தில் எது பெரியதாக உள்ளது?", a:"பக்திமார்க்கத்தின் நாற்று"},
-      {q:"கங்கை வெளிப்பட்டது என்று சொல்வதற்கு எதனை எய்தார்கள் எனப்படுகிறது?", a:"ஞான அம்பு"},
-      {q:"சிவபாபாவின் மகிமையை போர்டில் எழுதும்போது முதலில் என்ன பட்டம் வர வேண்டும்?", a:"பதீத பாவனர்"}
-    ],
-    extraDistractors: ["ஒளி", "கிராண்ட்", "ஃபாதர்", "ஆயிரம்", "யுகங்கள்", "வில்", "பழையஉலககத்தின்"]
-  },
-  {
-    pairs:[
-      {q:"காட்ரெஜ் (Godrej) என்று எதை உவமைப்படுத்தி முரளியில் பாபா கூறுகிறார்?", a:"புத்தியின் பூட்டை"},
-      {q:"சகோதர சகோதரிகளே வந்து புரிந்துகொள்ளுங்கள் என அழைப்பதற்கு முன் என்ன செய்ய வேண்டும்?", a:"ஞான மனனம்"},
-      {q:"கன்னிகை புகுந்த வீடு செல்லும்போது எதனை விட்டுச் செல்கிறாள் எனப்படுகிறது?", a:"பழைய ஆடைகள்"},
-      {q:"பாரதத்தின் படகு கீழே சென்றதை மீட்டதை எதில் காண்பிக்கிறார்கள்?", a:"சத்தியநாராயணர் கதையில்"},
-      {q:"இது கூட ___ ___ ஆகும் - ஆட்சியைப் பெறுவது மற்றும் இழப்பது?", a:"ஒரு கதை"}
-    ],
-    extraDistractors: ["பழைய", "விளையாட்டு", "ஆத்மாவின்", "சிந்தனை", "புதிய", "கலைகள்"]
-  }
+// ==========================================
+// 2. GAME DATA
+// ==========================================
+const questions = [
+  { q: "மகாவாக்கியங்களின் மீது எதன் நிழல்கள் விழுந்து விடுகிறது?", correctOrder: ["மாயையின்", "நிழல்கள்"], options: ["மாயையின்", "நிழல்கள்", "விகாரத்தின்", "செயல்கள்"] },
+  { q: "மனம் என்ற கோயில் தூய்மையானதாக ஆனால் தான், எப்படிபட்ட வைகுண்டத்திற்குச் செல்ல முடியும்?", correctOrder: ["தூய்மையான", "அன்பான"], options: ["சுகமான", "உயர்ந்த", "தூய்மையான", "அன்பான"] },
+  { q: "முயற்சியாளர் வாழ்க்கையில் தடைகளை எது உருவாக்கு கிறது?", correctOrder: ["ஞானமற்ற ", "அன்பு"], options: ["பண்பு", "சுயநல", "ஞானமற்ற ", "அன்பு"] },
+  { q: "ஞான ஸ்திதியில் நிலைத்திருப்பதன் மூலம் இந்த குணம் தானாகவே வந்து விடும்?", correctOrder: ["அமைதிரூப", "நிலை"], options: ["அன்பு", "நிலை", "பணிவு", "அமைதிரூப"] },
+  { q: "பரமாத்மா எந்த இரண்டு சொரூபமாக இருக்கின்றார்?", correctOrder: ["தூய்மை", "சாந்த"], options: ["தூய்மை", "அன்பு", "ஞான", "சாந்த"] },
+  { q: "மனதை வசப்படுத்துவதற்கு அவசியம் எது தேவை?", correctOrder: ["ஏதாவது", "சக்தி"], options: ["ஏதாவது", "உள்ளார்ந்த", "புத்தியோகம்", "சக்தி"] },
+  { q: "இரகசியம் புரியவில்லையோ அதுவரை என்ன செய்ய வேண்டும்?", correctOrder: ["தைரியத்தை", "தாரணை"], options: ["நம்பிக்கை", "சாட்சி", "தைரியத்தை", "தாரணை"] },
+  { q: "நிச்சய புத்தியுடைய காரணத்தால் உங்களது ஒவ்வொரு நரம்பிலும் எது நிறைந்திருக்கிறது?", correctOrder: ["ஈஸ்வரிய", "சக்தி"], options: ["ஈஸ்வரிய", "சக்தி", "தெய்வீக", "யோக"] },
+  { q: "முயற்சியாளர் குழந்தை முதலில் எந்த நிலையை தாரணை செய்ய வேண்டும்?", correctOrder: ["உள்நோக்கு", "நிலையை"], options: ["உள்நோக்கு", "நிலையை", "ஞான", "சாட்சி"] },
+  { q: "பெரிய சோதனைகளில் தேர்ச்சி ஆவதற்காக முன் கூட்டியே எது அவசியம்?", correctOrder: ["நாடக", "ஒத்திகை"], options: ["நாடக", "நடிகர்கள்", "யோக", "ஒத்திகை"] }
 ];
 
-let round=0, score=0, zoneData={}, dragId=null, checked=false, startTime=null;
+let currentLevel = 0, score = 0, selectedBubbles = [], startTime = null;
+const appDiv = document.getElementById('app');
 
-function shuffle(arr){return [...arr].sort(()=>Math.random()-0.5);}
+function shuffle(array) { return array.sort(() => Math.random() - 0.5); }
 
-function render(){
-  const area=document.getElementById('game-area');
-  if(startTime === null) startTime = Date.now();
-
-  if(round>=rounds.length){
-    const today = new Date(); today.setHours(0,0,0,0);
-    const totalSeconds = Math.floor((Date.now() - startTime) / 1000);
-    area.innerHTML = `<div class="glass-card" style="padding:20px;text-align:center;">Finalizing Results...</div>`;
-    let playerName = prompt("Game Over! Enter your name:") || "Player";
-
-    db.collection("leaderboard").add({
-      name: playerName.substring(0, 20), score: score,
-      durationSeconds: totalSeconds, timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
-      db.collection("leaderboard").where("timestamp", ">=", today).orderBy("timestamp", "desc").get().then((snapshot) => {
-          let scoresArr = [];
-          snapshot.forEach(doc => scoresArr.push(doc.data()));
-          scoresArr.sort((a,b) => b.score - a.score || a.durationSeconds - b.durationSeconds);
-
-          let boardHTML = `<div class="lb-container"><h3 style="text-align:center;margin-bottom:15px;">TODAY'S TOP 10</h3>`;
-          scoresArr.slice(0,10).forEach((d, idx) => {
-            boardHTML += `<div style="display:flex;justify-content:space-between;border-bottom:1px solid #eee;padding:10px 0; font-size:14px;">
-              <span>${idx+1}. <b>${d.name}</b> <small style="color:#888;">(${d.durationSeconds}s)</small></span>
-              <span style="color:var(--color-accent);font-weight:700;">${d.score} pts</span>
-            </div>`;
-          });
-          area.innerHTML=`<div class="glass-card" style="padding:20px;text-align:center;">
-            <h2 style="margin-bottom:10px;">Result: ${score} / 10</h2>
-            ${boardHTML}</div>
-            <button class="btn btn-primary" style="margin-top:15px;width:100%" onclick="location.reload()">Play Again</button></div>`;
-      });
-    });
-    return;
-  }
-
-  const r = rounds[round];
-  zoneData = {}; checked = false;
-  document.getElementById('rlbl').textContent = `Round ${round+1} / 2`;
-  document.getElementById('prog').style.width = ((round+1)/2*100)+'%';
-
-  let allWords = r.pairs.map(p => p.a.split(' ')).flat();
-  if(r.extraDistractors) allWords = allWords.concat(r.extraDistractors);
-  const pool = shuffle(allWords);
-
-  let rowsHTML = r.pairs.map((p,i) => `
-    <div class="match-row">
-      <div class="q-card glass-card">${p.q}</div>
-      <div class="drop-zone" id="zone-${i}" ondragover="ev(event)" ondragleave="el(event)" ondrop="drop(event,${i})">
-        <span style="color:#ccc;font-size:11px;">Drop 2 here</span>
+function initGame() {
+  currentLevel = 0; score = 0; startTime = Date.now();
+  appDiv.innerHTML = `
+    <div class="glass-card">
+      <div class="topbar">
+        <span class="lbl" id="q-lbl">Q 1 / ${questions.length}</span>
+        <span class="scr">Score: <span id="s-lbl">0</span></span>
       </div>
-    </div>`).join('');
-
-  area.innerHTML = `
-    <div class="match-list">${rowsHTML}</div>
-    <div class="drag-pool">${pool.map((w,i)=>`<div class="drag-chip" id="chip-${i}" draggable="true" ondragstart="ds(event,'${w}','chip-${i}')">${w}</div>`).join('')}</div>
-    <div class="btn-row"><button class="btn btn-primary" onclick="checkAnswers()">Check Answers</button></div>`;
+      <div class="prog-bg"><div class="prog-fill" id="prog-bar" style="width:0%"></div></div>
+      <div class="question-text" id="question">Loading...</div>
+      <div class="answer-area" id="answer-area"></div>
+      <div class="bubble-pool" id="bubble-pool"></div>
+    </div>`;
+  loadLevel();
 }
 
-function ds(e,val,id){ dragId={val,id}; }
-function ev(e){ e.preventDefault(); e.currentTarget.classList.add('over'); }
-function el(e){ e.currentTarget.classList.remove('over'); }
-
-function drop(e,idx){
-  e.preventDefault();
-  const zone = e.currentTarget;
-  zone.classList.remove('over');
-  if(!dragId || checked) return;
+function loadLevel() {
+  if (currentLevel >= questions.length) { endGame(); return; }
+  const levelData = questions[currentLevel];
+  document.getElementById('q-lbl').innerText = `Q ${currentLevel + 1} / ${questions.length}`;
+  document.getElementById('s-lbl').innerText = score;
+  document.getElementById('prog-bar').style.width = `${(currentLevel / questions.length) * 100}%`;
   
-  if(!zoneData[idx]) zoneData[idx] = [];
-  if(zoneData[idx].length >= 2) return; 
+  const questionEl = document.getElementById('question'), poolArea = document.getElementById('bubble-pool'), answerArea = document.getElementById('answer-area');
+  questionEl.innerHTML = levelData.q; answerArea.innerHTML = ''; poolArea.innerHTML = ''; selectedBubbles = [];
+  answerArea.classList.remove('success-flash', 'error-shake', 'locked'); poolArea.classList.remove('locked');
 
-  zoneData[idx].push(dragId);
-  document.getElementById(dragId.id).classList.add('used');
-  updateZoneUI(idx);
-  dragId = null;
-}
-
-// RESTORED: Single Clear Button Logic
-function updateZoneUI(idx) {
-  const zone = document.getElementById('zone-' + idx);
-  if (!zoneData[idx] || zoneData[idx].length === 0) {
-    zone.classList.remove('filled');
-    zone.innerHTML = `<span style="color:#ccc;font-size:11px;">Drop 2 here</span>`;
-    return;
-  }
-  
-  zone.classList.add('filled');
-  let content = zoneData[idx].map(data => `
-    <div class="glass-card" style="padding:4px 8px; font-size:12px; background:white;">${data.val}</div>
-  `).join(' ');
-
-  // Add a single clear button for the whole zone
-  zone.innerHTML = `${content} <div class="clear-btn" onclick="clearZone(${idx})">✕</div>`;
-}
-
-function clearZone(idx) {
-  if (checked) return;
-  if (zoneData[idx]) {
-    // Put all chips back in the pool
-    zoneData[idx].forEach(chip => {
-      document.getElementById(chip.id).classList.remove('used');
-    });
-    // Reset data
-    zoneData[idx] = [];
-    updateZoneUI(idx);
-  }
-}
-
-function checkAnswers(){
-  if(checked) return;
-  checked = true;
-  const r = rounds[round];
-  let gained = 0;
-  
-  r.pairs.forEach((p, i) => {
-    const zone = document.getElementById('zone-' + i);
-    // Remove clear button before checking
-    const clearBtn = zone.querySelector('.clear-btn');
-    if(clearBtn) clearBtn.remove();
-
-    const placed = zoneData[i] ? zoneData[i].map(d => d.val).join(' ') : "";
-    if(placed === p.a){
-      zone.className = 'drop-zone correct';
-      zone.innerHTML = `<span style="font-size:13px; font-weight:600;">${placed} ✓</span>`;
-      gained++;
-    } else {
-      zone.className = 'drop-zone wrong';
-      zone.innerHTML = `<div style="display:flex; flex-direction:column; align-items:center; width:100%;">
-        <span style="text-decoration:line-through; font-size:10px; color:#888;">${placed || 'Empty'}</span>
-        <small style="color:var(--color-error); font-weight:bold; font-size:11px;">→ ${p.a}</small>
-      </div>`;
-    }
+  shuffle([...levelData.options]).forEach((word, index) => {
+    const btn = document.createElement('div'); btn.className = 'bubble'; btn.innerText = word;
+    btn.onclick = () => moveToAnswer(btn, word);
+    poolArea.appendChild(btn);
   });
-  
-  score += gained;
-  document.getElementById('scr').textContent = `Score: ${score}`;
-  const btnRow = document.querySelector('.btn-row');
-  btnRow.innerHTML = `<button class="btn btn-primary" style="width:100%" onclick="nextRound()">${round<1?'Next Round':'View Results'}</button>`;
 }
 
-function nextRound(){ round++; render(); }
-render();
+function moveToAnswer(btnElement, word) {
+  btnElement.classList.add('hidden'); selectedBubbles.push(word);
+  const answerArea = document.getElementById('answer-area');
+  const clone = document.createElement('div'); clone.className = 'bubble'; clone.innerText = word;
+  clone.onclick = () => {
+    clone.remove(); btnElement.classList.remove('hidden');
+    selectedBubbles = selectedBubbles.filter(w => w !== word);
+  };
+  answerArea.appendChild(clone);
+  if (selectedBubbles.length === questions[currentLevel].correctOrder.length) checkAnswer();
+}
+
+function checkAnswer() {
+  const answerArea = document.getElementById('answer-area'), poolArea = document.getElementById('bubble-pool'), questionEl = document.getElementById('question');
+  const isCorrect = selectedBubbles.every((val, index) => val === questions[currentLevel].correctOrder[index]);
+  poolArea.classList.add('locked'); answerArea.classList.add('locked');
+  if (isCorrect) {
+    score++; document.getElementById('s-lbl').innerText = score;
+    answerArea.classList.add('success-flash'); questionEl.innerHTML = `<span style="color: var(--color-success);">✓ Perfect!</span>`;
+  } else {
+    answerArea.classList.add('error-shake'); questionEl.innerHTML = `<span style="color: var(--color-error);">✗ Incorrect</span>`;
+  }
+  setTimeout(() => { currentLevel++; loadLevel(); }, 1500);
+}
+
+function endGame() {
+  const totalSeconds = Math.floor((Date.now() - startTime) / 1000);
+  const minutes = Math.floor(totalSeconds / 60), seconds = totalSeconds % 60;
+  const timeTakenStr = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
+
+  appDiv.innerHTML = `<div class="glass-card" style="text-align:center;"><div class="question-text">Saving Score...</div></div>`;
+  let playerName = prompt("Game Over! Enter your name:") || "Player";
+
+  db.collection("leaderboard").add({
+    name: playerName.substring(0, 20), score: score, timeTaken: timeTakenStr,
+    durationSeconds: totalSeconds, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(() => {
+    const today = new Date(); today.setHours(0,0,0,0);
+    
+    // Fetch today's scores
+    db.collection("leaderboard")
+      .where("timestamp", ">=", today)
+      .orderBy("timestamp", "desc")
+      .get()
+      .then((snapshot) => {
+        let scoresArr = [];
+        snapshot.forEach(doc => scoresArr.push(doc.data()));
+
+        // SORT: Highest Score, then Fastest Time
+        scoresArr.sort((a, b) => b.score - a.score || a.durationSeconds - b.durationSeconds);
+
+        let boardHTML = `<div class="lb-container"><h3 class="lb-title">LEADERBOARD</h3><ol style="padding-left:0; list-style-position: inside; margin:0;">`;
+        scoresArr.slice(0, 10).forEach((data) => {
+          let timeDisplay = data.timestamp ? data.timestamp.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "";
+          boardHTML += `
+            <li class="lb-item">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span><div class="lb-name">${data.name}</div><div class="lb-date">${timeDisplay} &bull; ⏱️ ${data.timeTaken}</div></span>
+                <span class="lb-score">${data.score} pts</span>
+              </div>
+            </li>`;
+        });
+        boardHTML += `</ol></div>`;
+
+        appDiv.innerHTML = `
+          <div class="glass-card" style="text-align:center;">
+            <div class="final-score">${score} <span style="font-size:32px; color:var(--color-text-tertiary)">/ ${questions.length}</span></div>
+            <p style="margin-bottom:20px;">Time: <strong>${timeTakenStr}</strong></p>
+            ${boardHTML}
+            <button class="btn-primary" style="margin-top:24px;" onclick="initGame()">Play Again</button>
+          </div>`;
+      });
+  }).catch(() => {
+    appDiv.innerHTML = `<div class="glass-card" style="text-align:center;"><h2>Connection Error</h2><button class="btn-primary" onclick="initGame()">Try Again</button></div>`;
+  });
+}
+
+initGame();
 </script>
 </body>
 </html>
