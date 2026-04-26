@@ -82,11 +82,11 @@
   .bubble:active { transform: scale(0.95); }
   .answer-area .bubble { background: var(--color-accent); color: white; border-color: var(--color-accent); }
 
-  .success-flash { background: rgba(52, 199, 89, 0.15); border-color: var(--color-success); }
-  .success-flash .bubble { background: var(--color-success); border-color: var(--color-success); }
+  /* Specific styles for individual bubble validation */
+  .bubble-correct { background-color: var(--color-success) !important; border-color: var(--color-success) !important; color: white !important; }
+  .bubble-wrong { background-color: var(--color-error) !important; border-color: var(--color-error) !important; color: white !important; }
 
-  .error-shake { animation: shake 0.4s both; background: rgba(255, 59, 48, 0.15); border-color: var(--color-error); }
-  .error-shake .bubble { background: var(--color-error); border-color: var(--color-error); }
+  .error-shake { animation: shake 0.4s both; }
 
   @keyframes shake {
     10%, 90% { transform: translate3d(-2px, 0, 0); }
@@ -133,7 +133,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// 1. GAME DATA - 10 Questions from Avyakt Murali (26-04-2026)
+// 2. GAME DATA
 const questions = [
   { 
     q: "ஒன்று உங்களது புதிய வாழ்க்கைக்கான வாழ்த்து, இரண்டாவது _________________ வாழ்த்து, மூன்றாவது குடும்பம் மற்றும் தந்தையுடனான ____________________ வாழ்த்து", 
@@ -148,7 +148,7 @@ const questions = [
   { 
     q: "குறைந்தபட்சம் இந்தச் செய்தியை அவசியம் கொடுங்கள் - இப்போது _________ வந்துவிட்டார், இனி _________ அதிகாரி ஆகுங்கள்.", 
     correctOrder: ["தந்தை", "அழிவற்ற ஆஸ்திக்கு"], 
-    options: ["தந்தை", "அழிவற்ற ஆஸ்திக்கு", "கடவுள்", "சொர்க்கத்திற்கு", "பாபா", "பதவிக்கு"] 
+    options: ["தந்தை", "அழிவற்ற ஆஸ்திக்கு", "கடவுள்", "சொர்க்கத்திற்கு", "சத்கதி வழங்கும் வள்ளல்", "பதவிக்கு"] 
   },
   { 
     q: "லட்சியம் மற்றும் _________ சமமாக இருத்தல் வேண்டும், அப்போது தான் _________ ஆகுவது மிக சகஜமாக இருக்கும்.", 
@@ -188,7 +188,6 @@ const questions = [
 ];
 
 
-  
 let currentLevel = 0, score = 0, selectedBubbles = [], startTime = null;
 const appDiv = document.getElementById('app');
 
@@ -218,10 +217,14 @@ function loadLevel() {
   document.getElementById('prog-bar').style.width = `${(currentLevel / questions.length) * 100}%`;
   
   const questionEl = document.getElementById('question'), poolArea = document.getElementById('bubble-pool'), answerArea = document.getElementById('answer-area');
-  questionEl.innerHTML = levelData.q; answerArea.innerHTML = ''; poolArea.innerHTML = ''; selectedBubbles = [];
-  answerArea.classList.remove('success-flash', 'error-shake', 'locked'); poolArea.classList.remove('locked');
+  questionEl.innerHTML = levelData.q; 
+  answerArea.innerHTML = ''; 
+  poolArea.innerHTML = ''; 
+  selectedBubbles = [];
+  answerArea.classList.remove('error-shake', 'locked'); 
+  poolArea.classList.remove('locked');
 
-  shuffle([...levelData.options]).forEach((word, index) => {
+  shuffle([...levelData.options]).forEach((word) => {
     const btn = document.createElement('div'); btn.className = 'bubble'; btn.innerText = word;
     btn.onclick = () => moveToAnswer(btn, word);
     poolArea.appendChild(btn);
@@ -229,28 +232,65 @@ function loadLevel() {
 }
 
 function moveToAnswer(btnElement, word) {
-  btnElement.classList.add('hidden'); selectedBubbles.push(word);
+  btnElement.classList.add('hidden'); 
+  selectedBubbles.push(word);
+  
   const answerArea = document.getElementById('answer-area');
-  const clone = document.createElement('div'); clone.className = 'bubble'; clone.innerText = word;
+  const clone = document.createElement('div'); 
+  clone.className = 'bubble'; 
+  clone.innerText = word;
+  
+  // Allow removing only if verification hasn't started
   clone.onclick = () => {
-    clone.remove(); btnElement.classList.remove('hidden');
-    selectedBubbles = selectedBubbles.filter(w => w !== word);
+    if(!answerArea.classList.contains('locked')) {
+        clone.remove(); btnElement.classList.remove('hidden');
+        selectedBubbles = selectedBubbles.filter(w => w !== word);
+    }
   };
+  
   answerArea.appendChild(clone);
-  if (selectedBubbles.length === questions[currentLevel].correctOrder.length) checkAnswer();
+  
+  if (selectedBubbles.length === questions[currentLevel].correctOrder.length) {
+    checkAnswer();
+  }
 }
 
 function checkAnswer() {
-  const answerArea = document.getElementById('answer-area'), poolArea = document.getElementById('bubble-pool'), questionEl = document.getElementById('question');
-  const isCorrect = selectedBubbles.every((val, index) => val === questions[currentLevel].correctOrder[index]);
-  poolArea.classList.add('locked'); answerArea.classList.add('locked');
-  if (isCorrect) {
-    score++; document.getElementById('s-lbl').innerText = score;
-    answerArea.classList.add('success-flash'); questionEl.innerHTML = `<span style="color: var(--color-success);">✓ Perfect!</span>`;
+  const answerArea = document.getElementById('answer-area');
+  const poolArea = document.getElementById('bubble-pool');
+  const questionEl = document.getElementById('question');
+  const levelData = questions[currentLevel];
+  
+  poolArea.classList.add('locked'); 
+  answerArea.classList.add('locked');
+  
+  const placedBubbles = answerArea.querySelectorAll('.bubble');
+  let isPerfect = true;
+
+  // Validate each bubble individually
+  selectedBubbles.forEach((val, index) => {
+    if (val === levelData.correctOrder[index]) {
+        placedBubbles[index].classList.add('bubble-correct');
+    } else {
+        placedBubbles[index].classList.add('bubble-wrong');
+        isPerfect = false;
+    }
+  });
+
+  if (isPerfect) {
+    score++;
+    document.getElementById('s-lbl').innerText = score;
+    questionEl.innerHTML = `<span style="color: var(--color-success);">✓ Perfect!</span>`;
   } else {
-    answerArea.classList.add('error-shake'); questionEl.innerHTML = `<span style="color: var(--color-error);">✗ Incorrect</span>`;
+    answerArea.classList.add('error-shake');
+    questionEl.innerHTML = `<span style="color: var(--color-error);">✗ Incorrect</span>`;
   }
-  setTimeout(() => { currentLevel++; loadLevel(); }, 1500);
+
+  // Move to next question after display time
+  setTimeout(() => { 
+    currentLevel++; 
+    loadLevel(); 
+  }, 2500);
 }
 
 function endGame() {
@@ -267,7 +307,6 @@ function endGame() {
   }).then(() => {
     const today = new Date(); today.setHours(0,0,0,0);
     
-    // Fetch today's scores
     db.collection("leaderboard")
       .where("timestamp", ">=", today)
       .orderBy("timestamp", "desc")
@@ -275,8 +314,6 @@ function endGame() {
       .then((snapshot) => {
         let scoresArr = [];
         snapshot.forEach(doc => scoresArr.push(doc.data()));
-
-        // SORT: Highest Score, then Fastest Time
         scoresArr.sort((a, b) => b.score - a.score || a.durationSeconds - b.durationSeconds);
 
         let boardHTML = `<div class="lb-container"><h3 class="lb-title">LEADERBOARD</h3><ol style="padding-left:0; list-style-position: inside; margin:0;">`;
