@@ -316,7 +316,7 @@ function endGame() {
         snapshot.forEach(doc => scoresArr.push(doc.data()));
         scoresArr.sort((a, b) => b.score - a.score || a.durationSeconds - b.durationSeconds);
 
-        let boardHTML = `<div class="lb-container"><h3 class="lb-title">LEADERBOARD</h3><ol style="padding-left:0; list-style-position: inside; margin:0;">`;
+        let boardHTML = `<div class="lb-container"><h3 class="lb-title">TODAY'S LEADERBOARD</h3><ol style="padding-left:0; list-style-position: inside; margin:0;">`;
         scoresArr.slice(0, 10).forEach((data) => {
           let timeDisplay = data.timestamp ? data.timestamp.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "";
           boardHTML += `
@@ -334,12 +334,66 @@ function endGame() {
             <div class="final-score">${score} <span style="font-size:32px; color:var(--color-text-tertiary)">/ ${questions.length}</span></div>
             <p style="margin-bottom:20px;">Time: <strong>${timeTakenStr}</strong></p>
             ${boardHTML}
-            <button class="btn-primary" style="margin-top:24px;" onclick="initGame()">Play Again</button>
+            <button class="btn-primary" style="margin-top:20px;" onclick="initGame()">Play Again</button>
+            <button class="btn-primary" style="margin-top:12px; background:#5856d6;" onclick="showWeeklyTop5()">View Weekly Toppers</button>
           </div>`;
       });
   }).catch(() => {
     appDiv.innerHTML = `<div class="glass-card" style="text-align:center;"><h2>Connection Error</h2><button class="btn-primary" onclick="initGame()">Try Again</button></div>`;
   });
+}
+
+async function showWeeklyTop5() {
+  appDiv.innerHTML = `<div class="glass-card" style="text-align:center;"><div class="question-text">Calculating Weekly Report...</div></div>`;
+  
+  const now = new Date();
+  const diff = (now.getDay() === 0 ? 6 : now.getDay() - 1);
+  const curMon = new Date(now); curMon.setDate(now.getDate() - diff); curMon.setHours(0,0,0,0);
+  
+  const start = new Date(curMon); start.setDate(curMon.getDate() - 7);
+  const end = new Date(curMon); end.setMilliseconds(-1);
+
+  try {
+    const snap = await db.collection("leaderboard")
+      .where("timestamp", ">=", start)
+      .where("timestamp", "<=", end)
+      .get();
+
+    const totals = {};
+    snap.forEach(doc => {
+      const d = doc.data();
+      let n = (d.name || "").trim();
+      let lower = n.toLowerCase();
+      if (lower === "player" || lower === "testrun" || n.length <= 1) return;
+      totals[n] = (totals[n] || 0) + d.score;
+    });
+
+    const top5 = Object.keys(totals).map(n => ({ n, s: totals[n] }))
+      .sort((a,b) => b.s - a.s)
+      .slice(0, 5);
+
+    const dateStr = `${start.toLocaleDateString(undefined, {month:'short', day:'numeric'})} - ${end.toLocaleDateString(undefined, {month:'short', day:'numeric'})}`;
+
+    let listHtml = top5.map((item, i) => `
+      <div class="lb-item">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span>#${i+1} <span class="lb-name" style="display:inline;">${item.n}</span></span>
+          <span class="lb-score">${item.s} pts</span>
+        </div>
+      </div>`).join('') || "<p style='padding:20px;'>No toppers found for last week.</p>";
+
+    appDiv.innerHTML = `
+      <div class="glass-card" style="text-align:center;">
+        <h2 style="margin-bottom:5px;">Weekly Toppers</h2>
+        <div style="font-size:12px; color:var(--color-text-tertiary); margin-bottom:15px;">Last Week: ${dateStr}</div>
+        <div class="lb-container">
+          ${listHtml}
+        </div>
+        <button class="btn-primary" style="margin-top:24px;" onclick="initGame()">Back to Home</button>
+      </div>`;
+  } catch (e) {
+    appDiv.innerHTML = `<div class="glass-card" style="text-align:center;"><h2>Error loading data</h2><button class="btn-primary" onclick="initGame()">Back</button></div>`;
+  }
 }
 
 initGame();
