@@ -82,7 +82,6 @@
   .bubble:active { transform: scale(0.95); }
   .answer-area .bubble { background: var(--color-accent); color: white; border-color: var(--color-accent); }
 
-  /* Specific styles for individual bubble validation */
   .bubble-correct { background-color: var(--color-success) !important; border-color: var(--color-success) !important; color: white !important; }
   .bubble-wrong { background-color: var(--color-error) !important; border-color: var(--color-error) !important; color: white !important; }
 
@@ -240,7 +239,6 @@ function moveToAnswer(btnElement, word) {
   clone.className = 'bubble'; 
   clone.innerText = word;
   
-  // Allow removing only if verification hasn't started
   clone.onclick = () => {
     if(!answerArea.classList.contains('locked')) {
         clone.remove(); btnElement.classList.remove('hidden');
@@ -267,7 +265,6 @@ function checkAnswer() {
   const placedBubbles = answerArea.querySelectorAll('.bubble');
   let isPerfect = true;
 
-  // Validate each bubble individually
   selectedBubbles.forEach((val, index) => {
     if (val === levelData.correctOrder[index]) {
         placedBubbles[index].classList.add('bubble-correct');
@@ -277,16 +274,20 @@ function checkAnswer() {
     }
   });
 
+  const feedbackHtml = isPerfect 
+    ? `<div style="color: var(--color-success); margin-top: 10px; font-weight: 700;">✓ Perfect!</div>` 
+    : `<div style="color: var(--color-error); margin-top: 10px; font-weight: 700;">✗ Incorrect</div>`;
+
   if (isPerfect) {
     score++;
     document.getElementById('s-lbl').innerText = score;
-    questionEl.innerHTML = `<span style="color: var(--color-success);">✓ Perfect!</span>`;
   } else {
     answerArea.classList.add('error-shake');
-    questionEl.innerHTML = `<span style="color: var(--color-error);">✗ Incorrect</span>`;
   }
 
-  // Move to next question after display time
+  // Update question area with original text AND feedback
+  questionEl.innerHTML = levelData.q + feedbackHtml;
+
   setTimeout(() => { 
     currentLevel++; 
     loadLevel(); 
