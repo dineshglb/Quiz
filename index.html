@@ -16,7 +16,6 @@
     --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
     --color-text-primary: #1d1d1f; 
     --color-text-secondary: #515154;
-    --color-text-tertiary: #86868b;
     --color-accent: #007aff; 
     --color-success: #34c759; 
     --color-error: #ff3b30; 
@@ -31,7 +30,6 @@
       radial-gradient(circle at 85% 20%, #c4e0ff 0%, transparent 40%),
       radial-gradient(circle at 50% 80%, #ffd1e8 0%, transparent 40%);
     background-attachment: fixed;
-    -webkit-tap-highlight-color: transparent; 
     font-family: var(--font-sans);
     min-height: 100vh;
     display: flex;
@@ -39,7 +37,7 @@
     padding: 20px 15px;
   }
 
-  #app { width: 100%; max-width: 600px; }
+  #app { width: 100%; max-width: 600px; position: relative; }
 
   .glass-card {
     background: var(--glass-bg);
@@ -49,84 +47,74 @@
     box-shadow: var(--glass-shadow);
     border-radius: 24px;
     padding: 24px 20px;
+    text-align: center;
+  }
+
+  .overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.4); backdrop-filter: blur(8px);
+    display: flex; justify-content: center; align-items: center; z-index: 1000;
+  }
+
+  .input-field {
+    width: 100%; padding: 16px; border-radius: 12px; border: 1px solid rgba(0,0,0,0.1);
+    margin-bottom: 20px; font-size: 16px; outline: none; text-align: center;
   }
 
   .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-  .lbl { font-size: 14px; font-weight: 600; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
-  .scr { font-size: 16px; font-weight: 700; color: var(--color-text-primary); }
-
+  .lbl { font-size: 14px; font-weight: 600; color: var(--color-text-secondary); text-transform: uppercase; }
   .prog-bg { height: 6px; background: rgba(0,0,0,0.05); border-radius: 3px; margin-bottom: 24px; overflow: hidden; }
-  .prog-fill { height: 100%; background: var(--color-accent); transition: width 0.4s cubic-bezier(0.25, 0.1, 0.25, 1); }
-
-  .question-text {
-    font-size: 18px; font-weight: 600; color: var(--color-text-primary);
-    line-height: 1.5; margin-bottom: 24px; text-align: center; min-height: 54px;
+  .prog-fill { height: 100%; background: var(--color-accent); transition: width 0.4s; }
+  .question-text { font-size: 18px; font-weight: 600; line-height: 1.5; margin-bottom: 24px; min-height: 54px; }
+  .answer-area { 
+    min-height: 70px; background: rgba(255, 255, 255, 0.4); border: 2px dashed rgba(0,0,0,0.15); 
+    border-radius: 20px; display: flex; flex-wrap: wrap; gap: 10px; padding: 12px; margin-bottom: 30px; justify-content: center; 
   }
-
-  .answer-area {
-    min-height: 70px; background: rgba(255, 255, 255, 0.4);
-    border: 2px dashed rgba(0,0,0,0.15); border-radius: 20px;
-    display: flex; flex-wrap: wrap; gap: 10px; padding: 12px;
-    margin-bottom: 30px; justify-content: center; align-items: center;
+  .bubble-pool { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+  .bubble { 
+    background: white; border-radius: 20px; padding: 12px 18px; font-size: 16px; 
+    cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.1s;
   }
-
-  .bubble-pool { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; min-height: 120px; }
-
-  .bubble {
-    background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(0,0,0,0.1);
-    border-radius: 20px; padding: 12px 18px; font-size: 16px; font-weight: 500;
-    color: var(--color-text-primary); cursor: pointer; user-select: none;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: transform 0.1s;
-  }
-
-  .bubble:active { transform: scale(0.95); }
-  .answer-area .bubble { background: var(--color-accent); color: white; border-color: var(--color-accent); }
-
-  .bubble-correct { background-color: var(--color-success) !important; border-color: var(--color-success) !important; color: white !important; }
-  .bubble-wrong { background-color: var(--color-error) !important; border-color: var(--color-error) !important; color: white !important; }
-
-  .error-shake { animation: shake 0.4s both; }
-
-  @keyframes shake {
-    10%, 90% { transform: translate3d(-2px, 0, 0); }
-    30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
-    40%, 60% { transform: translate3d(6px, 0, 0); }
-  }
-
-  .hidden { visibility: hidden; opacity: 0; pointer-events: none; position: absolute; }
+  .answer-area .bubble { background: var(--color-accent); color: white; }
+  .bubble-correct { background: var(--color-success) !important; color: white; }
+  .bubble-wrong { background: var(--color-error) !important; color: white; }
+  
+  .hidden { display: none; }
   .locked { pointer-events: none; }
-
-  .final-score { font-size: 56px; font-weight: 700; color: var(--color-text-primary); margin: 10px 0; }
+  
   .btn-primary { 
     padding: 16px 24px; font-size: 16px; font-weight: 600; border-radius: 24px; 
-    cursor: pointer; background: var(--color-accent); color: white; border: none; 
-    width: 100%; transition: transform 0.2s; 
+    background: var(--color-accent); color: white; border: none; width: 100%; cursor: pointer;
   }
-
-  .lb-container { text-align: left; margin-top: 20px; background: rgba(255,255,255,0.4); border-radius: 20px; padding: 20px; max-height: 350px; overflow-y: auto; }
-  .lb-title { font-size: 16px; margin-bottom: 15px; text-align: center; font-weight: 700; }
+  .lb-container { text-align: left; margin-top: 20px; background: rgba(255,255,255,0.4); border-radius: 20px; padding: 15px; }
   .lb-item { margin-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 8px; }
   .lb-name { font-weight: 600; font-size: 15px; }
-  .lb-date { color: var(--color-text-tertiary); font-size: 12px; }
   .lb-score { font-weight: 700; color: var(--color-accent); font-size: 15px; }
 </style>
 </head>
 <body>
 
-<div id="app"></div>
+<div id="app">
+    <div id="name-modal" class="overlay">
+        <div class="glass-card" style="width: 90%; max-width: 400px;">
+            <h2 style="margin-bottom:15px;">Welcome</h2>
+            <p style="margin-bottom:20px; color:var(--color-text-secondary);">Enter your name to start the daily Murli quiz.</p>
+            <input type="text" id="player-name-input" class="input-field" placeholder="Your Name">
+            <button class="btn-primary" onclick="startWithValidation()">Start Quiz</button>
+        </div>
+    </div>
+
+    <div id="game-container" class="hidden"></div>
+</div>
 
 <script>
-// ==========================================
-// 1. FIREBASE SETUP
-// ==========================================
 const firebaseConfig = {
   apiKey: "AIzaSyDqoqpUFUkShdXMy21MEWhKsHKFlQUyNPo",
   authDomain: "murliquizleaderboard.firebaseapp.com",
   projectId: "murliquizleaderboard",
   storageBucket: "murliquizleaderboard.firebasestorage.app",
   messagingSenderId: "22978189390",
-  appId: "1:22978189390:web:3b8cc0e44d12e181288b1f",
-  measurementId: "G-7SEZBTTKZR"
+  appId: "1:22978189390:web:3b8cc0e44d12e181288b1f"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -150,7 +138,7 @@ const questions = [
     options: ["புள்ளி", "ஞானத்தை", "சக்தியை", "சுகத்தை", "ஒலி", "சிவா"] 
   },
   { 
-    q: "ஸ்ரீகிருஷ்ணர் முற்றிலும் 84 பிறவிகள் எடுக்கின்றார்,________ இருந்து வெளியே வந்தவுடன் 84 பிறவிகளின் _________ ஆரம்பமாகின்றது.", 
+    q: "ஸ்ரீகிருஷ்ணர் முற்றிலும் 84 பிறவிகள் எடுக் கின்றார்,________ இருந்து வெளியே வந்தவுடன் 84 பிறவிகளின் _________ ஆரம்பமாகின்றது.", 
     correctOrder: ["கர்ப்பத்தில்", "கணக்கு"], 
     options: ["கணக்கு", "பரந்தாமத்தில் ", "நடிப்பு", "கர்ப்பத்தில்", "பார்ட்", "உடலில்"] 
   },
@@ -161,7 +149,7 @@ const questions = [
   },
   { 
     q: "ஆத்மா தூய்மையாக இருந்தபொழுது _________ இருந்தது, காமவிகாரம் எனும் நெருப்பினால் _________ ஆகிவிட்டது.", 
-    correctOrder: ["அழகானதாக", "கருப்பாக"], 
+    correctOrder: ["அழகானதாக", "கருப்பாகிவிட்டது"], 
     options: ["அழகானதாக", "கருப்பாக", "ஒளியாக", "அழுக்காக", "பெரியதாக", "சிறியதாக"] 
   },
   { 
@@ -185,166 +173,124 @@ const questions = [
     options: ["ஆசிர்வாதங்களை", "தூய்மையாக", "மரியாதையை", "நிச்சயமாக", "தூய்மையாக", "மரியாதைக்குரியவர்"] 
   }
 ];
-  
-let currentLevel = 0, score = 0, selectedBubbles = [], startTime = null;
-const appDiv = document.getElementById('app');
 
-function shuffle(array) { return array.sort(() => Math.random() - 0.5); }
+let currentLevel = 0, score = 0, selectedBubbles = [], startTime = null, playerName = "", currentDocId = null;
+
+async function startWithValidation() {
+    const input = document.getElementById('player-name-input');
+    playerName = input.value.trim();
+    if (playerName.length < 2) return alert("Please enter a valid name");
+
+    document.getElementById('name-modal').classList.add('hidden');
+    document.getElementById('game-container').classList.remove('hidden');
+    
+    const entry = await db.collection("leaderboard").add({
+        name: playerName,
+        score: 0,
+        status: "started",
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    currentDocId = entry.id;
+    initGame();
+}
 
 function initGame() {
-  currentLevel = 0; score = 0; startTime = Date.now();
-  appDiv.innerHTML = `
-    <div class="glass-card">
-      <div class="topbar">
-        <span class="lbl" id="q-lbl">Q 1 / ${questions.length}</span>
-        <span class="scr">Score: <span id="s-lbl">0</span></span>
-      </div>
-      <div class="prog-bg"><div class="prog-fill" id="prog-bar" style="width:0%"></div></div>
-      <div class="question-text" id="question">Loading...</div>
-      <div class="answer-area" id="answer-area"></div>
-      <div class="bubble-pool" id="bubble-pool"></div>
-    </div>`;
-  loadLevel();
+    currentLevel = 0; score = 0; startTime = Date.now();
+    document.getElementById('game-container').innerHTML = `
+        <div class="glass-card">
+            <div class="topbar">
+                <span class="lbl" id="q-lbl">Q 1 / ${questions.length}</span>
+                <span class="scr">Score: <span id="s-lbl">0</span></span>
+            </div>
+            <div class="prog-bg"><div class="prog-fill" id="prog-bar" style="width:0%"></div></div>
+            <div id="question" class="question-text"></div>
+            <div id="answer-area" class="answer-area"></div>
+            <div id="bubble-pool" class="bubble-pool"></div>
+        </div>`;
+    loadLevel();
 }
 
 function loadLevel() {
-  if (currentLevel >= questions.length) { endGame(); return; }
-  const levelData = questions[currentLevel];
-  document.getElementById('q-lbl').innerText = `Q ${currentLevel + 1} / ${questions.length}`;
-  document.getElementById('s-lbl').innerText = score;
-  document.getElementById('prog-bar').style.width = `${(currentLevel / questions.length) * 100}%`;
-  
-  const questionEl = document.getElementById('question'), poolArea = document.getElementById('bubble-pool'), answerArea = document.getElementById('answer-area');
-  questionEl.innerHTML = levelData.q; 
-  answerArea.innerHTML = ''; 
-  poolArea.innerHTML = ''; 
-  selectedBubbles = [];
-  answerArea.classList.remove('error-shake', 'locked'); 
-  poolArea.classList.remove('locked');
+    if (currentLevel >= questions.length) { finishGame(); return; }
+    const data = questions[currentLevel];
+    document.getElementById('q-lbl').innerText = `Q ${currentLevel + 1} / ${questions.length}`;
+    document.getElementById('prog-bar').style.width = `${(currentLevel / questions.length) * 100}%`;
+    
+    const pool = document.getElementById('bubble-pool'), ans = document.getElementById('answer-area');
+    document.getElementById('question').innerHTML = data.q;
+    ans.innerHTML = ''; pool.innerHTML = ''; ans.classList.remove('locked');
+    selectedBubbles = [];
 
-  shuffle([...levelData.options]).forEach((word) => {
-    const btn = document.createElement('div'); btn.className = 'bubble'; btn.innerText = word;
-    btn.onclick = () => moveToAnswer(btn, word);
-    poolArea.appendChild(btn);
-  });
-}
-
-function moveToAnswer(btnElement, word) {
-  btnElement.classList.add('hidden'); 
-  selectedBubbles.push(word);
-  
-  const answerArea = document.getElementById('answer-area');
-  const clone = document.createElement('div'); 
-  clone.className = 'bubble'; 
-  clone.innerText = word;
-  
-  clone.onclick = () => {
-    if(!answerArea.classList.contains('locked')) {
-        clone.remove(); btnElement.classList.remove('hidden');
-        selectedBubbles = selectedBubbles.filter(w => w !== word);
-    }
-  };
-  
-  answerArea.appendChild(clone);
-  
-  if (selectedBubbles.length === questions[currentLevel].correctOrder.length) {
-    checkAnswer();
-  }
+    [...data.options].sort(() => Math.random() - 0.5).forEach(word => {
+        const b = document.createElement('div'); b.className = 'bubble'; b.innerText = word;
+        b.onclick = () => {
+            b.classList.add('hidden');
+            selectedBubbles.push(word);
+            const clone = document.createElement('div'); clone.className = 'bubble'; clone.innerText = word;
+            clone.onclick = () => { if(!ans.classList.contains('locked')) { clone.remove(); b.classList.remove('hidden'); selectedBubbles = selectedBubbles.filter(w => w !== word); } };
+            ans.appendChild(clone);
+            if (selectedBubbles.length === data.correctOrder.length) checkAnswer();
+        };
+        pool.appendChild(b);
+    });
 }
 
 function checkAnswer() {
-  const answerArea = document.getElementById('answer-area');
-  const poolArea = document.getElementById('bubble-pool');
-  const questionEl = document.getElementById('question');
-  const levelData = questions[currentLevel];
-  
-  poolArea.classList.add('locked'); 
-  answerArea.classList.add('locked');
-  
-  const placedBubbles = answerArea.querySelectorAll('.bubble');
-  let isPerfect = true;
+    const ansArea = document.getElementById('answer-area');
+    ansArea.classList.add('locked');
+    const correct = questions[currentLevel].correctOrder;
+    let isCorrect = selectedBubbles.every((val, i) => val === correct[i]);
 
-  selectedBubbles.forEach((val, index) => {
-    if (val === levelData.correctOrder[index]) {
-        placedBubbles[index].classList.add('bubble-correct');
-    } else {
-        placedBubbles[index].classList.add('bubble-wrong');
-        isPerfect = false;
+    const items = ansArea.querySelectorAll('.bubble');
+    selectedBubbles.forEach((val, i) => items[i].classList.add(val === correct[i] ? 'bubble-correct' : 'bubble-wrong'));
+
+    if (isCorrect) {
+        score++;
+        document.getElementById('s-lbl').innerText = score;
+        db.collection("leaderboard").doc(currentDocId).update({ score: score });
     }
-  });
-
-  const feedbackHtml = isPerfect 
-    ? `<div style="color: var(--color-success); margin-top: 10px; font-weight: 700;">✓ Perfect!</div>` 
-    : `<div style="color: var(--color-error); margin-top: 10px; font-weight: 700;">✗ Incorrect</div>`;
-
-  if (isPerfect) {
-    score++;
-    document.getElementById('s-lbl').innerText = score;
-  } else {
-    answerArea.classList.add('error-shake');
-  }
-
-  // Update question area with original text AND feedback
-  questionEl.innerHTML = levelData.q + feedbackHtml;
-
-  setTimeout(() => { 
-    currentLevel++; 
-    loadLevel(); 
-  }, 2500);
+    setTimeout(() => { currentLevel++; loadLevel(); }, 1500);
 }
 
-function endGame() {
-  const totalSeconds = Math.floor((Date.now() - startTime) / 1000);
-  const minutes = Math.floor(totalSeconds / 60), seconds = totalSeconds % 60;
-  const timeTakenStr = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
+function finishGame() {
+    const totalSeconds = Math.floor((Date.now() - startTime) / 1000);
+    db.collection("leaderboard").doc(currentDocId).update({
+        status: "completed",
+        durationSeconds: totalSeconds,
+        timeTaken: `${Math.floor(totalSeconds/60)}m ${totalSeconds%60}s`
+    }).then(showLeaderboard);
+}
 
-  appDiv.innerHTML = `<div class="glass-card" style="text-align:center;"><div class="question-text">Saving Score...</div></div>`;
-  let playerName = prompt("Game Over! Enter your name:") || "Player";
-
-  db.collection("leaderboard").add({
-    name: playerName.substring(0, 20), score: score, timeTaken: timeTakenStr,
-    durationSeconds: totalSeconds, timestamp: firebase.firestore.FieldValue.serverTimestamp()
-  }).then(() => {
+function showLeaderboard() {
     const today = new Date(); today.setHours(0,0,0,0);
-    
-    db.collection("leaderboard")
-      .where("timestamp", ">=", today)
-      .orderBy("timestamp", "desc")
-      .get()
-      .then((snapshot) => {
-        let scoresArr = [];
-        snapshot.forEach(doc => scoresArr.push(doc.data()));
-        scoresArr.sort((a, b) => b.score - a.score || a.durationSeconds - b.durationSeconds);
+    db.collection("leaderboard").where("timestamp", ">=", today).orderBy("timestamp", "desc").get().then(snap => {
+        let scores = [];
+        snap.forEach(doc => scores.push(doc.data()));
+        scores.sort((a,b) => b.score - a.score);
 
-        let boardHTML = `<div class="lb-container"><h3 class="lb-title">TODAY'S LEADERBOARD</h3><ol style="padding-left:0; list-style-position: inside; margin:0;">`;
-        scoresArr.slice(0, 10).forEach((data) => {
-          let timeDisplay = data.timestamp ? data.timestamp.toDate().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : "";
-          boardHTML += `
-            <li class="lb-item">
-              <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span><div class="lb-name">${data.name}</div><div class="lb-date">${timeDisplay} &bull; ⏱️ ${data.timeTaken}</div></span>
-                <span class="lb-score">${data.score} pts</span>
-              </div>
-            </li>`;
-        });
-        boardHTML += `</ol></div>`;
+        let list = scores.slice(0, 10).map(s => `
+            <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(0,0,0,0.05);">
+                <span><b>${s.name}</b><br><small>${s.status === 'completed' ? 'Finished' : 'Incomplete'}</small></span>
+                <span style="color:var(--color-accent); font-weight:700;">${s.score} pts</span>
+            </div>`).join('');
 
-        appDiv.innerHTML = `
-          <div class="glass-card" style="text-align:center;">
-            <div class="final-score">${score} <span style="font-size:32px; color:var(--color-text-tertiary)">/ ${questions.length}</span></div>
-            <p style="margin-bottom:20px;">Time: <strong>${timeTakenStr}</strong></p>
-            ${boardHTML}
-            <button class="btn-primary" style="margin-top:20px;" onclick="initGame()">Play Again</button>
-            <button class="btn-primary" style="margin-top:12px; background:#5856d6;" onclick="showWeeklyTop5()">View Weekly Toppers</button>
-          </div>`;
-      });
-  }).catch(() => {
-    appDiv.innerHTML = `<div class="glass-card" style="text-align:center;"><h2>Connection Error</h2><button class="btn-primary" onclick="initGame()">Try Again</button></div>`;
-  });
+        document.getElementById('game-container').innerHTML = `
+            <div class="glass-card">
+                <h1>Quiz Over!</h1>
+                <div style="font-size:48px; margin:20px 0;">${score} / ${questions.length}</div>
+                <div class="lb-container">
+                    <h4 style="text-align:center; margin-bottom:10px;">TODAY'S ACTIVITY</h4>
+                    ${list}
+                </div>
+                <button class="btn-primary" style="margin-top:20px;" onclick="location.reload()">Play Again</button>
+                <button class="btn-primary" style="margin-top:12px; background:#5856d6;" onclick="showWeeklyTop5()">View Weekly Toppers</button>
+            </div>`;
+    });
 }
 
 async function showWeeklyTop5() {
-  appDiv.innerHTML = `<div class="glass-card" style="text-align:center;"><div class="question-text">Calculating Weekly Report...</div></div>`;
+  const container = document.getElementById('game-container');
+  container.innerHTML = `<div class="glass-card" style="text-align:center;"><div class="question-text">Calculating Weekly Report...</div></div>`;
   
   const now = new Date();
   const diff = (now.getDay() === 0 ? 6 : now.getDay() - 1);
@@ -382,21 +328,19 @@ async function showWeeklyTop5() {
         </div>
       </div>`).join('') || "<p style='padding:20px;'>No toppers found for last week.</p>";
 
-    appDiv.innerHTML = `
+    container.innerHTML = `
       <div class="glass-card" style="text-align:center;">
         <h2 style="margin-bottom:5px;">Weekly Toppers</h2>
         <div style="font-size:12px; color:var(--color-text-tertiary); margin-bottom:15px;">Last Week: ${dateStr}</div>
         <div class="lb-container">
           ${listHtml}
         </div>
-        <button class="btn-primary" style="margin-top:24px;" onclick="initGame()">Back to Home</button>
+        <button class="btn-primary" style="margin-top:24px;" onclick="location.reload()">Back to Home</button>
       </div>`;
   } catch (e) {
-    appDiv.innerHTML = `<div class="glass-card" style="text-align:center;"><h2>Error loading data</h2><button class="btn-primary" onclick="initGame()">Back</button></div>`;
+    container.innerHTML = `<div class="glass-card" style="text-align:center;"><h2>Error loading data</h2><button class="btn-primary" onclick="location.reload()">Back</button></div>`;
   }
 }
-
-initGame();
 </script>
 </body>
 </html>
