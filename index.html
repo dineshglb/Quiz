@@ -350,7 +350,7 @@ async function showWeeklyTop5() {
       // Save ONLY first attempt
       if (!firstAttempts[uniqueKey]) {
         firstAttempts[uniqueKey] = {
-          name: n,
+          name:n.charAt(0).toUpperCase() + n.slice(1).toLowerCase(),
           score: d.score || 0
         };
       }
