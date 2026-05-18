@@ -120,57 +120,57 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// 1. GAME DATA - 10 Questions from Avyakt Murali (17-05-2026)
+// 1. GAME DATA - 10 Questions from Murali (18-05-2026)
 const questions = [
   { 
-    q: "___________என்பது தந்தை மற்றும் குழந்தைகளுக்கான ஒருமித்த _________ ஆகும், முழு கல்பத்திலும் இதுபோல் நடப்பதே இல்லை.", 
-    correctOrder: ["சிவஜெயந்தி", "பிறந்த நாள்"], 
-    options: ["தீபாவளி", "பிறந்த நாள்", "தனியான", "பக்தி திருவிழா", "சாதாரண", "சிவஜெயந்தி"] 
+    q: "நாம் ஈஸ்வரிய குடும்பத்தினர் - நாம் நமது _________ தெய்வீக _________ ஸ்திபனை செய்து கொண்டிருக்கிறோம் என்ற ஆன்மீக போதையில் இருங்கள்.", 
+    correctOrder: ["மறைமுகமான", "இராஜாங்கத்தை"], 
+    options: ["மறைமுகமான", "இராஜாங்கத்தை", "ஸ்தூலமான", "ஆசிரமத்தை", "புதிய", "கோயிலை"] 
   },
   { 
-    q: "__________ சிவராத்திரியைக் கொண்டாடும்போது சிவலிங்கத்துடன் சேர்த்து _________ சேர்த்து பூஜை செய்கின்றார்கள்.", 
-    correctOrder: ["பக்தர்கள்", "சாலிக்கிராமங்களுக்கும்"], 
-    options: ["பக்தர்கள்", "சாலிக்கிராமங்களுக்கும்", "நந்திக்கும்", "தேவதைகளுக்கும்", "குழந்தைகளுக்கும்", "மனிதர்கள்", "குழந்தைகள்"] 
+    q: "உண்மையில் இது எல்லையில்லாத தந்தையின் குடும்பமாகும். ஈஸ்வரிய _______________. இவர்களுக்காக விநாச காலத்தில் _______ புத்தி உடையவர்களே வெற்றி அடைவோர்! என்று பாடப்படுகிறது. இப்பேர்ப்பட்ட குடும்பம் ஒரு பொழுதும் கீதையில் பாடப்படவில்லை.", 
+    correctOrder: ["விஷ்வவித்தியாலயம்", "அன்பான"], 
+    options: ["விஷ்வவித்தியாலயம்", "நிச்சய", "பக்தி", "குடும்பம்", "சேனை", "அசையாத"] 
   },
   { 
-    q: "நாம் ஒரு பிறவிக்கான பவித்ரதாவின் விரதத்தை எடுத்தால், அது _________ _________ வரை நீடிக்கும்.", 
-    correctOrder: ["21", "பிறவிகள்"], 
-    options: ["21", "பிறவிகள்", "84", "யுகங்கள்", "1", "ஜென்மம்"] 
+    q: "கலியுகத்தில் அசுர குடும்பம், சத்யுகத்தில் தெய்வீக குடும்பம், ஆனால் இந்த சங்கமத்தில் உங்களுடையது _________ _________ ஆகும்.", 
+    correctOrder: ["ஈஸ்வரிய", "குடும்பம்"], 
+    options: ["ஈஸ்வரிய", "குடும்பம்", "மனித", "சாதாரண", "பழைய", "அழுக்கான"] 
   },
   { 
-    q: "தூய்மை என்பது வெறும் பிரம்மச்சரியம் மட்டுமல்ல, _________ , _________ , செயல், உறவு மற்றும் தொடர்பு என அனைத்திலும் தூய்மையாகும்.", 
-    correctOrder: ["எண்ணம்", "சொல்"], 
-    options: ["எண்ணம்", "சொல்", "பணம்", "புகழ்", "பக்தி", "ஆசை"] 
+    q: "இச்சமயத்தில் நீங்கள் _________ _________ ஆக உள்ளீர்கள், ஏனெனில் ஆத்மா ஞானம் நிறைந்து இருக்கிறது, வாழ்வோ யோகமயமாக உள்ளது.", 
+    correctOrder: ["ரூப்", "பஸந்த்"], 
+    options: ["ரூப்", "பஸந்த்", "ஞான", "யோகி", "பூஜாரி", "தேவதை"] 
   },
   { 
-    q: "கோபம் என்ற பூதம் மற்றவர்களுடனான சம்பந்தம், தொடர்பில் வந்து நம்மை அதற்கு _________ _________ ஆக்கி விடுகிறது.", 
-    correctOrder: ["கட்டாயப்படுத்தப்பட்டவராக", "அடிமையாக"], 
-    options: ["கட்டாயப்படுத்தப்பட்டவராக", "அடிமையாக", "மன்னனாக", "அதிபாக்கியசாலியாக", "எஜமானராக", "யோகியாக"] 
+    q: "84 பிறவிகளின் சக்கரம் சுற்றி வந்துள்ள பிரஜாபிதா பிரம்மா இந்த மனித சிருஷ்டியின் கிரேட் கிரேட் _________ _________ ஆகிறார்.", 
+    correctOrder: ["கிராண்டு", "ஃபாதர்"], 
+    options: ["கிராண்டு", "ஃபாதர்", "மதர்", "டீச்சர்", "குரு", "அரசன்"] 
   },
   { 
-    q: "கோபம் வருவதற்கான முக்கியமான காரணம் என்னவென்று பார்க்கும் போது, எங்காவது ஒரு மூலையில் _________ இருப்பதும், மற்றவர்களிடம் குறைகளைக் காண்பதும் தேவையற்ற __________ எனும் விதையை உருவாக்குகிறது.", 
-    correctOrder: ["பொறாமை", "எண்ணங்கள்"], 
-    options: ["பொறாமை", "எண்ணங்கள்", "அன்பு", "உயர்ந்த லட்சியத்தை", "பற்று", "அமைதியான நிலையை"] 
+    q: "சாட்சாத்காரங்கள் மற்றும் காட்சிகள் ஆகியவற்றில் _________ பிரவேசம் நிறைய ஆகிறது, இவை எல்லாமே _________ பிரவேசம் ஆகும்.", 
+    correctOrder: ["மாயையின்", "பூதங்களின்"], 
+    options: ["மாயையின்", "பூதங்களின்", "சிவனின்", "தேவர்களின்", "ஆத்மாவின்", "அன்பின்"] 
   },
   { 
-    q: "சிவபெருமானுக்கு _________ மலர்களை அர்ப்பணிப்பது போல, நாம் பாபாவிற்கு _________ என்னும் மலரை அர்ப்பணிக்க வேண்டும்.", 
-    correctOrder: ["எருக்கஞ்செடி", "கோபம்"], 
-    options: ["எருக்கஞ்செடி", "கோபம்", "ரோஜா", "காமம்", "தாமரை", "பற்று"] 
+    q: "சத்யுகத்தில் ___ தந்தை, சங்கமத்தில் ___ தந்தையர் ஆவார்கள்.", 
+    correctOrder: ["1", "3"], 
+    options: ["3", "2", "4", "1"] 
   },
   { 
-    q: "கோபத்தை அர்ப்பணித்து விட்டால் அனைத்து சேவை மையங்களும் _________ _________ என்ற வரதானத்திற்கு உரியதாக ஆகிவிடும்.", 
-    correctOrder: ["நிர்விக்ன", "பவ"], 
-    options: ["நிர்விக்ன", "பவ", "மகா", "யோகி", "சதா", "சுகி"] 
+    q: "_________ மட்டும் நினைவு செய்வதல்ல. தந்தையின் நினைவினால் தான் ___________ விநாசம் ஆகும்.", 
+    correctOrder: ["சாந்தி தாமத்தை", "விகர்மங்கள்"], 
+    options: ["சாந்தி தாமத்தை", "பிரம்மாவை", "விகர்மங்கள்", "தேவர்களை", "ஆத்மாவை", "பாவங்கள்"] 
   },
   { 
-    q: "தந்தை சொன்னார் மேலும் ஜகதம்பா (மம்மா) செய்தார், இந்த _________ _________ மூலம் மம்மா முதலிடம் பெற்றார்.", 
-    correctOrder: ["தீவிர", "புருஷார்த்தத்தின்"], 
-    options: ["தீவிர", "புருஷார்த்தத்தின்", "மெதுவான", "பக்தியின்", "சாதாரண", "சேவையின்"] 
+    q: "ஒவ்வொரு விஷயத்திலும் _________ கிரஹித்துக் கொண்டு ஆல்ரவுண்ட் ஆகக்கூடிய _________ புருஷார்த்தி ஆகுக.", 
+    correctOrder: ["சாரத்தைக்", "சரள"], 
+    options: ["சாரத்தைக்", "சரள", "சக்தியை", "தீவிர", "சாந்தியை", "பறக்கும்"] 
   },
   { 
-    q: "மரியாதை கொடுப்பது தான் மரியாதையைப் பெறுவதாகும், இதற்காக ஒவ்வொரு விஷயத்திலும் _________ _________ என்ற பாடத்தை உறுதி செய்யுங்கள்.", 
-    correctOrder: ["முதலில்", "நீங்கள்"], 
-    options: ["முதலில்", "நீங்கள்", "நானே", "முன்னால்", "பாபா", "மட்டும்"] 
+    q: "ஒரே இரசனை (ஏக்ரஸ்) நிலை உருவாக்கும் போது எந்தவொரு காட்சியைப் பார்க்கும்போதும் _________ ? _________ ? என்ற கேள்விகள் வராது.", 
+    correctOrder: ["ஏன்", "எப்படி"], 
+    options: ["ஏன்", "எப்படி", "யார்", "எங்கு", "என்ன", "எதற்கு"] 
   }
 ];
 
@@ -288,57 +288,137 @@ function showLeaderboard() {
     });
 }
 
+// UPDATED WEEKLY TOP 5 LOGIC
 async function showWeeklyTop5() {
   const container = document.getElementById('game-container');
-  container.innerHTML = `<div class="glass-card" style="text-align:center;"><div class="question-text">Calculating Weekly Report...</div></div>`;
-  
+  container.innerHTML = `
+    <div class="glass-card" style="text-align:center;">
+      <div class="question-text">
+        Calculating Weekly Report...
+      </div>
+    </div>
+  `;
+
   const now = new Date();
   const diff = (now.getDay() === 0 ? 6 : now.getDay() - 1);
-  const curMon = new Date(now); curMon.setDate(now.getDate() - diff); curMon.setHours(0,0,0,0);
-  
-  const start = new Date(curMon); start.setDate(curMon.getDate() - 7);
-  const end = new Date(curMon); end.setMilliseconds(-1);
+  const curMon = new Date(now);
+  curMon.setDate(now.getDate() - diff);
+  curMon.setHours(0,0,0,0);
+
+  const start = new Date(curMon);
+  start.setDate(curMon.getDate() - 7);
+  const end = new Date(curMon);
+  end.setMilliseconds(-1);
 
   try {
-    const snap = await db.collection("leaderboard")
+    const snap = await db
+      .collection("leaderboard")
       .where("timestamp", ">=", start)
       .where("timestamp", "<=", end)
       .get();
 
-    const totals = {};
+    const docs = [];
     snap.forEach(doc => {
-      const d = doc.data();
-      let n = (d.name || "").trim();
-      let lower = n.toLowerCase();
-      if (lower === "player" || lower === "testrun" || n.length <= 1) return;
-      totals[n] = (totals[n] || 0) + d.score;
+      docs.push(doc.data());
     });
 
-    const top5 = Object.keys(totals).map(n => ({ n, s: totals[n] }))
-      .sort((a,b) => b.s - a.s)
-      .slice(0, 5);
+    // Sort by earliest timestamp
+    docs.sort((a, b) => {
+      const ta = a.timestamp?.toDate()?.getTime() || 0;
+      const tb = b.timestamp?.toDate()?.getTime() || 0;
+      return ta - tb;
+    });
 
-    const dateStr = `${start.toLocaleDateString(undefined, {month:'short', day:'numeric'})} - ${end.toLocaleDateString(undefined, {month:'short', day:'numeric'})}`;
+    // First attempt per user per day
+    const firstAttempts = {};
+    docs.forEach(d => {
+      let n = (d.name || "").trim();
+      let lower = n.toLowerCase();
+
+      if (
+        lower === "player" ||
+        lower === "testrun" ||
+        n.length <= 1
+      ) return;
+
+      const ts = d.timestamp?.toDate();
+      if (!ts) return;
+
+      const dayKey = ts.getFullYear() + "-" + (ts.getMonth() + 1) + "-" + ts.getDate();
+      const uniqueKey = `${lower}_${dayKey}`;
+
+      // Save ONLY first attempt
+      if (!firstAttempts[uniqueKey]) {
+        firstAttempts[uniqueKey] = {
+          name: n,
+          score: d.score || 0
+        };
+      }
+    });
+
+    // Weekly totals
+    const totals = {};
+    Object.values(firstAttempts).forEach(entry => {
+      totals[entry.name] = (totals[entry.name] || 0) + entry.score;
+    });
+
+    // Top 5
+    const top5 = Object.keys(totals)
+      .map(n => ({ n, s: totals[n] }))
+      .sort((a,b) => b.s - a.s)
+      .slice(0,5);
+
+    const dateStr = `${start.toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric'
+    })} - ${end.toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric'
+    })}`;
 
     let listHtml = top5.map((item, i) => `
       <div class="lb-item">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span>#${i+1} <span class="lb-name" style="display:inline;">${item.n}</span></span>
+          <span>
+            #${i+1}
+            <span class="lb-name" style="display:inline;">${item.n}</span>
+          </span>
           <span class="lb-score">${item.s} pts</span>
         </div>
-      </div>`).join('') || "<p style='padding:20px;'>No toppers found for last week.</p>";
+      </div>
+    `).join('');
+
+    if (!listHtml) {
+      listHtml = `
+        <p style="padding:20px;">
+          No toppers found for last week.
+        </p>
+      `;
+    }
 
     container.innerHTML = `
       <div class="glass-card" style="text-align:center;">
         <h2 style="margin-bottom:5px;">Weekly Toppers</h2>
-        <div style="font-size:12px; color:var(--color-text-tertiary); margin-bottom:15px;">Last Week: ${dateStr}</div>
+        <div style="font-size:12px; color:var(--color-text-secondary); margin-bottom:15px;">
+          Last Week: ${dateStr}
+        </div>
         <div class="lb-container">
           ${listHtml}
         </div>
-        <button class="btn-primary" style="margin-top:24px;" onclick="location.reload()">Back to Home</button>
-      </div>`;
+        <button class="btn-primary" style="margin-top:24px;" onclick="location.reload()">
+          Back to Home
+        </button>
+      </div>
+    `;
+
   } catch (e) {
-    container.innerHTML = `<div class="glass-card" style="text-align:center;"><h2>Error loading data</h2><button class="btn-primary" onclick="location.reload()">Back</button></div>`;
+    console.error(e);
+    container.innerHTML = `
+      <div class="glass-card" style="text-align:center;">
+        <h2>Error loading data</h2>
+        <button class="btn-primary" onclick="location.reload()">Back</button>
+      </div>
+    `;
   }
 }
 </script>
