@@ -78,10 +78,10 @@
   .answer-area .bubble { background: var(--color-accent); color: white; }
   .bubble-correct { background: var(--color-success) !important; color: white; }
   .bubble-wrong { background: var(--color-error) !important; color: white; }
-  
+   
   .hidden { display: none; }
   .locked { pointer-events: none; }
-  
+   
   .btn-primary { 
     padding: 16px 24px; font-size: 16px; font-weight: 600; border-radius: 24px; 
     background: var(--color-accent); color: white; border: none; width: 100%; cursor: pointer;
@@ -261,6 +261,7 @@ function finishGame() {
     }).then(showLeaderboard);
 }
 
+// FULLY UPDATED TO DISPLAY TIMETAKEN
 function showLeaderboard() {
     const today = new Date(); today.setHours(0,0,0,0);
     db.collection("leaderboard").where("timestamp", ">=", today).orderBy("timestamp", "desc").get().then(snap => {
@@ -268,11 +269,17 @@ function showLeaderboard() {
         snap.forEach(doc => scores.push(doc.data()));
         scores.sort((a,b) => b.score - a.score);
 
-        let list = scores.slice(0, 10).map(s => `
+        let list = scores.slice(0, 10).map(s => {
+            const timeDisplay = s.timeTaken ? ` | ⏱️ ${s.timeTaken}` : '';
+            return `
             <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(0,0,0,0.05);">
-                <span><b>${s.name}</b><br><small>${s.status === 'completed' ? 'Finished' : 'Incomplete'}</small></span>
+                <span>
+                    <b>${s.name}</b><br>
+                    <small>${s.status === 'completed' ? 'Finished' : 'Incomplete'}${s.status === 'completed' ? timeDisplay : ''}</small>
+                </span>
                 <span style="color:var(--color-accent); font-weight:700;">${s.score} pts</span>
-            </div>`).join('');
+            </div>`;
+        }).join('');
 
         document.getElementById('game-container').innerHTML = `
             <div class="glass-card">
@@ -288,7 +295,6 @@ function showLeaderboard() {
     });
 }
 
-// UPDATED WEEKLY TOP 5 LOGIC
 async function showWeeklyTop5() {
   const container = document.getElementById('game-container');
   container.innerHTML = `
@@ -322,14 +328,12 @@ async function showWeeklyTop5() {
       docs.push(doc.data());
     });
 
-    // Sort by earliest timestamp
     docs.sort((a, b) => {
       const ta = a.timestamp?.toDate()?.getTime() || 0;
       const tb = b.timestamp?.toDate()?.getTime() || 0;
       return ta - tb;
     });
 
-    // First attempt per user per day
     const firstAttempts = {};
     docs.forEach(d => {
       let n = (d.name || "").trim();
@@ -347,7 +351,6 @@ async function showWeeklyTop5() {
       const dayKey = ts.getFullYear() + "-" + (ts.getMonth() + 1) + "-" + ts.getDate();
       const uniqueKey = `${lower}_${dayKey}`;
 
-      // Save ONLY first attempt
       if (!firstAttempts[uniqueKey]) {
         firstAttempts[uniqueKey] = {
           name:n.charAt(0).toUpperCase() + n.slice(1).toLowerCase(),
@@ -356,13 +359,11 @@ async function showWeeklyTop5() {
       }
     });
 
-    // Weekly totals
     const totals = {};
     Object.values(firstAttempts).forEach(entry => {
       totals[entry.name] = (totals[entry.name] || 0) + entry.score;
     });
 
-    // Top 5
     const top5 = Object.keys(totals)
       .map(n => ({ n, s: totals[n] }))
       .sort((a,b) => b.s - a.s)
@@ -380,7 +381,7 @@ async function showWeeklyTop5() {
       <div class="lb-item">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <span>
-            #${i+1}
+            #i+1
             <span class="lb-name" style="display:inline;">${item.n}</span>
           </span>
           <span class="lb-score">${item.s} pts</span>
