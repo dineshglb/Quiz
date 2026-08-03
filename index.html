@@ -63,14 +63,7 @@
 
   .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
   .lbl { font-size: 14px; font-weight: 600; color: var(--color-text-secondary); text-transform: uppercase; }
-  .timer-badge { 
-    background: rgba(255, 59, 48, 0.1); 
-    color: var(--color-error); 
-    padding: 4px 10px; 
-    border-radius: 12px; 
-    font-weight: 700; 
-    font-size: 14px; 
-  }
+
   .prog-bg { height: 6px; background: rgba(0,0,0,0.05); border-radius: 3px; margin-bottom: 24px; overflow: hidden; }
   .prog-fill { height: 100%; background: var(--color-accent); transition: width 0.4s; }
   .question-text { font-size: 18px; font-weight: 600; line-height: 1.5; margin-bottom: 24px; min-height: 54px; }
@@ -86,10 +79,10 @@
   .answer-area .bubble { background: var(--color-accent); color: white; }
   .bubble-correct { background: var(--color-success) !important; color: white; }
   .bubble-wrong { background: var(--color-error) !important; color: white; }
-   
+    
   .hidden { display: none; }
   .locked { pointer-events: none; }
-   
+    
   .btn-primary { 
     padding: 16px 24px; font-size: 16px; font-weight: 600; border-radius: 24px; 
     background: var(--color-accent); color: white; border: none; width: 100%; cursor: pointer;
@@ -133,75 +126,70 @@ const questions = [
   { 
     q: "நீங்கள் உண்மையிலும் உண்மையான _________ , இராஜயோகிகளாக இருக்கிறீர்கள், நீங்கள் இராஜ்யத்தை அடைவதற்காக கண்டிப்பாக _________ வேண்டும்.", 
     correctOrder: ["இராஜரிஷிகள்,", "தூய்மையடைய"], 
-    // Evidence: "இனிமையான குழந்தைகளே! நீங்கள் உண்மையிலும் உண்மையான இராஜரிஷிகள், இராஜயோகிகளாக இருக்கிறீர்கள், நீங்கள் இராஜ்யத்தை அடைவதற்காக கண்டிப்பாக தூய்மையடைய வேண்டும்."
     options: ["இராஜரிஷிகள்,", "தூய்மையடைய", "ஆன்மீகவாதிகள்,", "முயற்சி செய்ய", "ஈஸ்வரிய வாரிசுகள்,", "படிப்பைப் படிக்க"] 
   },
   { 
     q: " _________ மீது முழுமையிலும் முழுமையான கவனம் இருந்தது என்றால் இராஜ்யம் கிடைத்து விடும், தந்தை சொல்வதை நல்ல விதமாக கேட்டு _________ செய்யுங்கள்.", 
     correctOrder: ["படிப்பின்", "தாரணை"], 
-    // Evidence: "பதில்: படிப்பின் மீது முழுமையிலும் முழுமையான கவனம் இருந்தது என்றால் இராஜ்யம் கிடைத்து விடும். தந்தை சொல்வதை நல்ல விதமாக கேட்டு தாரணை செய்யுங்கள்."
     options: ["படிப்பின்", "தாரணை", "யோகத்தின்", "சேவை", "ஸ்ரீமத்தின்", "சுவாத்தியாயம்"] 
   },
   { 
     q: "கேட்கும்போது கொட்டாவி விட்டாலோ, தூங்கி விழுந்தாலோ, புத்தி அலைந்தாலோ _________ இழந்து விடுவீர்கள், ஆகையால் படிப்பின் மீது முழுமையிலும் முழுமையான _________ கொடுங்கள்.", 
     correctOrder: ["இராஜ்யத்தை", "கவனத்தை"], 
-    // Evidence: "கேட்கும்போது கொட்டாவி விட்டாலோ, தூங்கி விழுந்தாலோ, புத்தி அலைந்தாலோ இராஜ்யத்தை இழந்து விடுவீர்கள். ஆகையால் படிப்பின் மீது முழுமையிலும் முழுமையான கவனத்தைக் கொடுங்கள்."
     options: ["இராஜ்யத்தை", "கவனத்தை", "ஆஸ்தியை", "நேரத்தைக்", "சொர்க்கத்தை", "விருப்பத்தை"] 
   },
   { 
     q: "இப்போது எல்லைக்கப்பாற்பட்ட தந்தை சொல்கிறார் - குழந்தைகளே, நாங்கள் தூய்மையாய் இருப்போம் என _________ கொடுங்கள், ஒரு போதும் _________ செல்ல மாட்டோம்.", 
     correctOrder: ["உறுதி மொழி", "விகாரத்தில்"], 
-    // Evidence: "இப்போது எல்லைக்கப்பாற்பட்ட தந்தை சொல்கிறார் - குழந்தைகளே, நாங்கள் தூய்மையாய் இருப்போம் என உறுதி மொழி கொடுங்கள். ஒரு போதும் விகாரத்தில் செல்ல மாட்டோம்."
     options: ["உறுதி மொழி", "விகாரத்தில்", "எழுதி", "தவறான வழியில்", "கை", "மாயையிடம்"] 
   },
   { 
     q: "நீங்கள் யோக பலத்தின் மூலம் உலகத்தின் எஜமானர் ஆகிறீர்கள், இது _________ சக்தியாகும், இதில் நீங்கள் பேச வேண்டிய அவசியமில்லை, நினைவின் பலத்தின் மூலம் நீங்கள் பாபாவிடமிருந்து _________ இராஜ்யத்தை எடுக்கிறீர்கள்.", 
     correctOrder: ["அமைதியின்", "உலகின்"], 
-    // Evidence: "நீங்கள் யோக பலத்தின் மூலம் உலகின் எஜமானர் ஆகிறீர்கள். இது அமைதியின் சக்தியாகும், இதில் நீங்கள் பேச வேண்டிய அவசியமில்லை. நினைவின் பலத்தின் மூலம் நீங்கள் பாபாவிடமிருந்து உலகின் இராஜ்யத்தை எடுக்கிறீர்கள்."
     options: ["அமைதியின்", "உலகின்", "அவ்யக்த", "சொர்க்கத்தின்", "ஆத்மாவின்", "சத்யுகத்தின்"] 
   },
   { 
     q: "குலத்திற்கு களங்கம் விளைவிக்கும் எந்த _________ செய்யக் கூடாது, தூய்மை அடைவதற்கான _________ தனக்குத் தானே எடுக்க வேண்டும்.", 
     correctOrder: ["கெட்ட செயலையும்", "உறுதி மொழியை"], 
-    // Evidence: "தாரணைக்கான முக்கிய சாரம்: 1. குலத்திற்கு களங்கம் விளைவிக்கும் எந்த கெட்ட செயலையும் செய்யக் கூடாது. தூய்மை யடைவதற்கான உறுதி மொழியை தனக்குத் தானே எடுக்க வேண்டும்."
     options: ["கெட்ட செயலையும்", "உறுதி மொழியை", "செயலும்", "சிந்தனை", "வீண் விஷயங்களை", "ஸ்ரீமத்தை"] 
   },
   { 
     q: "தனது நேரம், பணம், எதையும் _________ கூடாது, மலர்கள் நிறைந்த தோட்டத்திற்குச் செல்வதற்காக _________ நீக்க வேண்டும்.", 
     correctOrder: ["வீணாக்கக்", "முட்களை (தன்னிடமிருந்து)"], 
-    // Evidence: "தாரணைக்கான முக்கிய சாரம்: 2. தனது நேரம், பணம், எதையும் வீணாக்கக் கூடாது. மலர்கள் நிறைந்த தோட்டத்திற்குச் செல்வதற்காக முட்களை (தன்னிடமிருந்து) நீக்க வேண்டும்."
     options: ["வீணாக்கக்", "முட்களை (தன்னிடமிருந்து)", "அழிக்கக்", "விகாரங்களை", "செலவழிக்கக்", "கறைகளை"] 
   },
   { 
     q: "அலௌகீக விளையாட்டு மற்றும் பொம்மை விளையாட்டை விளையாடிக் கொண்டே சதா சக்திசாலியாகக் கூடிய _________ ஆகுக, இதில் பயமோ, பீதியோ அடைய வேண்டாம், அனைத்து சங்கல்பங்களையும், பாப்தாதாவிடம் _________ விடுங்கள்.", 
     correctOrder: ["ஆடாத அசையாதவர்", "சமர்ப்பித்து"], 
-    // Evidence: "வரதானம்: அலௌகீக விளையாட்டு மற்றும் பொம்மை விளையாட்டை விளையாடிக் கொண்டே சதா சக்திசாலியாகக் கூடிய ஆடாத அசையாதவர் ஆகுக !... இதில் பயமோ, பீதியோ அடைய வேண்டாம். அனைத்து சங்கல்பங்களையும், பாப்தாதாவிடம் சமர்பித்து விடுங்கள்."
     options: ["ஆடாத அசையாதவர்", "சமர்ப்பித்து", "விக்ன விநாசகர்", "எடுத்து", "மாஸ்டர் சர்வசக்திவான்", "கொடுத்து"] 
   },
   { 
     q: "எந்த விதமான உலகீய விசயங்களைக் கேட்பதோ, சொல்லுவதோ கூட சுயத்தில் _________ சேர்த்துக் கொள்வதாகும்.", 
     correctOrder: ["குப்பைகளைச்"], 
-    // Evidence: "சுலோகன்: எந்த விதமான உலகீய விசயங்களைக் கேட்பதோ, சொல்லுவதோ கூட சுயத்தில் குப்பைகளைச் சேர்த்துக் கொள்வதாகும்."
     options: ["குப்பைகளைச்", "பாரங்களைச்", "விகாரங்களைச்", "பலவீனங்களைச்"] 
   },
   { 
-    q: "அவ்யக்த இஷாரா : எண்ணத்தில் கூட தூய்மை மற்றும் அசுத்தம் இல்லாமல் இருப்பதுதான் _________ என்று கூறப்படுகிறது, ஆகையால் தூய்மையாக இருங்கள், _________ இருங்கள் என்ற முதல் பாடத்தைச் சொரூபத்தில் கொண்டு வாருங்கள்.", 
+    q: "எண்ணத்தில் கூட தூய்மை மற்றும் அசுத்தம் இல்லாமல் இருப்பதுதான் _________ என்று கூறப்படுகிறது, ஆகையால் தூய்மையாக இருங்கள், _________ இருங்கள் என்ற முதல் பாடத்தைச் சொரூபத்தில் கொண்டு வாருங்கள்.", 
     correctOrder: ["சம்பூர்ண தூய்மை", "யோகியாக"], 
-    // Evidence: "அவ்யக்த இஷாரா : எண்ணத்தில் கூட தூய்மை மற்றும் அசுத்தம் இல்லாமல் இருப்பதுதான் சம்பூர்ண தூய்மை என்று கூறப்படுகிறது. ஆகையால் தூய்மையாக இருங்கள், யோகியாக இருங்கள் என்ற முதல் பாடத்தைச் சொரூபத்தில் கொண்டு வாருங்கள்."
     options: ["சம்பூர்ண தூய்மை", "யோகியாக", "உண்மையான பவித்திரம்", "அசரீரியாக", "பாப்-சமான்", "தபஸ்வியாக"] 
   }
 ];
 
+let currentLevel = 0, score = 0, selectedBubbles = [], startTime = null, playerName = "", currentDocId = null;
 
-  
-
-  let currentLevel = 0, score = 0, selectedBubbles = [], startTime = null, playerName = "", currentDocId = null;
-let timerInterval = null, timeLeft = 90;
-
-function formatTime(sec) {
-    const mins = Math.floor(sec / 60);
-    const secs = sec % 60;
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+// Helper function to convert seconds into Hours, Minutes, Seconds format
+function formatTotalTime(totalSec) {
+    if (!totalSec) return '0s';
+    const hrs = Math.floor(totalSec / 3600);
+    const mins = Math.floor((totalSec % 3600) / 60);
+    const secs = totalSec % 60;
+    
+    let parts = [];
+    if (hrs > 0) parts.push(`${hrs}h`);
+    if (mins > 0 || hrs > 0) parts.push(`${mins}m`);
+    parts.push(`${secs}s`);
+    
+    return parts.join(' ');
 }
 
 async function startWithValidation() {
@@ -228,7 +216,6 @@ function initGame() {
         <div class="glass-card">
             <div class="topbar">
                 <span class="lbl" id="q-lbl">Q 1 / ${questions.length}</span>
-                <span class="timer-badge">⏳ <span id="timer-lbl">1:30</span></span>
                 <span class="scr">Score: <span id="s-lbl">0</span></span>
             </div>
             <div class="prog-bg"><div class="prog-fill" id="prog-bar" style="width:0%"></div></div>
@@ -241,12 +228,9 @@ function initGame() {
 
 function loadLevel() {
     if (currentLevel >= questions.length) { 
-        clearInterval(timerInterval);
         finishGame(); 
         return; 
     }
-    
-    clearInterval(timerInterval);
     
     const data = questions[currentLevel];
     document.getElementById('q-lbl').innerText = `Q ${currentLevel + 1} / ${questions.length}`;
@@ -256,17 +240,6 @@ function loadLevel() {
     document.getElementById('question').innerHTML = data.q;
     ans.innerHTML = ''; pool.innerHTML = ''; ans.classList.remove('locked');
     selectedBubbles = [];
-
-    timeLeft = 90;
-    document.getElementById('timer-lbl').innerText = formatTime(timeLeft);
-    timerInterval = setInterval(() => {
-        timeLeft--;
-        document.getElementById('timer-lbl').innerText = formatTime(timeLeft);
-        if (timeLeft <= 0) {
-            clearInterval(timerInterval);
-            handleTimeout();
-        }
-    }, 1000);
 
     [...data.options].sort(() => Math.random() - 0.5).forEach(word => {
         const b = document.createElement('div'); b.className = 'bubble'; b.innerText = word;
@@ -282,29 +255,7 @@ function loadLevel() {
     });
 }
 
-function handleTimeout() {
-    const ansArea = document.getElementById('answer-area');
-    ansArea.classList.add('locked');
-    
-    const items = ansArea.querySelectorAll('.bubble');
-    if (items.length > 0) {
-        items.forEach(el => el.classList.add('bubble-wrong'));
-    } else {
-        const timeoutMsg = document.createElement('div');
-        timeoutMsg.innerText = "Time's Up!";
-        timeoutMsg.style.color = "var(--color-error)";
-        timeoutMsg.style.fontWeight = "bold";
-        ansArea.appendChild(timeoutMsg);
-    }
-
-    setTimeout(() => { 
-        currentLevel++; 
-        loadLevel(); 
-    }, 1500);
-}
-
 function checkAnswer() {
-    clearInterval(timerInterval);
     const ansArea = document.getElementById('answer-area');
     ansArea.classList.add('locked');
     const correct = questions[currentLevel].correctOrder;
@@ -330,7 +281,6 @@ function finishGame() {
     }).then(showLeaderboard);
 }
 
-// UPDATED: Displays Status, Duration, AND Start Time in Today's Activity
 function showLeaderboard() {
     const today = new Date(); today.setHours(0,0,0,0);
     db.collection("leaderboard").where("timestamp", ">=", today).orderBy("timestamp", "desc").get().then(snap => {
@@ -342,7 +292,6 @@ function showLeaderboard() {
             const statusText = s.status === 'completed' ? 'Finished' : 'Incomplete';
             const durationText = s.timeTaken ? ` • ⏱️ ${s.timeTaken}` : '';
             
-            // Format start time string (e.g., "10:15 AM")
             let attemptTimeStr = '';
             if (s.timestamp) {
                 const dateObj = s.timestamp.toDate ? s.timestamp.toDate() : new Date(s.timestamp);
@@ -368,31 +317,28 @@ function showLeaderboard() {
                     ${list}
                 </div>
                 <button class="btn-primary" style="margin-top:20px;" onclick="location.reload()">Play Again</button>
-                <button class="btn-primary" style="margin-top:12px; background:#5856d6;" onclick="showWeeklyTop5()">View Weekly Toppers</button>
+                <button class="btn-primary" style="margin-top:12px; background:#5856d6;" onclick="showMonthlyTop5()">View Previous Month Toppers</button>
             </div>`;
     });
 }
 
-async function showWeeklyTop5() {
+async function showMonthlyTop5() {
   const container = document.getElementById('game-container');
   container.innerHTML = `
     <div class="glass-card" style="text-align:center;">
       <div class="question-text">
-        Calculating Weekly Report...
+        Calculating Monthly Report...
       </div>
     </div>
   `;
 
   const now = new Date();
-  const diff = (now.getDay() === 0 ? 6 : now.getDay() - 1);
-  const curMon = new Date(now);
-  curMon.setDate(now.getDate() - diff);
-  curMon.setHours(0,0,0,0);
-
-  const start = new Date(curMon);
-  start.setDate(curMon.getDate() - 7);
-  const end = new Date(curMon);
-  end.setMilliseconds(-1);
+  
+  // Start of previous month (e.g. July 1st 00:00:00)
+  const start = new Date(now.getFullYear(), now.getMonth() - 1, 1, 0, 0, 0, 0);
+  
+  // End of previous month (e.g. July 31st 23:59:59.999)
+  const end = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
 
   try {
     const snap = await db
@@ -461,18 +407,10 @@ async function showWeeklyTop5() {
       })
       .slice(0, 5);
 
-    const dateStr = `${start.toLocaleDateString(undefined, {
-      month: 'short',
-      day: 'numeric'
-    })} - ${end.toLocaleDateString(undefined, {
-      month: 'short',
-      day: 'numeric'
-    })}`;
+    const monthName = start.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
 
     let listHtml = top5.map((item, i) => {
-      const mins = Math.floor(item.d / 60);
-      const secs = item.d % 60;
-      const timeStr = item.d ? `${mins}m ${secs}s` : 'N/A';
+      const timeStr = formatTotalTime(item.d);
 
       return `
       <div class="lb-item">
@@ -480,7 +418,7 @@ async function showWeeklyTop5() {
           <span>
             #${i + 1}
             <span class="lb-name" style="display:inline;">${item.n}</span>
-            <br><small style="color:var(--color-text-secondary);">⏱️ Total Time: ${timeStr}</small>
+            <br><small style="color:var(--color-text-secondary);">⏱️ Time spent on Murli: ${timeStr}</small>
           </span>
           <span class="lb-score">${item.s} pts</span>
         </div>
@@ -490,16 +428,16 @@ async function showWeeklyTop5() {
     if (!listHtml) {
       listHtml = `
         <p style="padding:20px;">
-          No toppers found for last week.
+          No toppers found for ${monthName}.
         </p>
       `;
     }
 
     container.innerHTML = `
       <div class="glass-card" style="text-align:center;">
-        <h2 style="margin-bottom:5px;">Weekly Toppers</h2>
+        <h2 style="margin-bottom:5px;">Monthly Toppers</h2>
         <div style="font-size:12px; color:var(--color-text-secondary); margin-bottom:15px;">
-          Last Week: ${dateStr}
+          Period: ${monthName}
         </div>
         <div class="lb-container">
           ${listHtml}
